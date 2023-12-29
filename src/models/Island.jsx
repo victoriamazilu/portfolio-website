@@ -12,7 +12,7 @@ import { useFrame, useThree} from '@react-three/fiber';
 import { a } from '@react-spring/three';
 import islandScene from '../assets/3d/island.glb';
 
-const Island = ({isRotating, setIsRotating, ...props}) => {
+const Island = ({isRotating, setIsRotating, setCurrentStage, ...props}) => {
   const islandRef = useRef();
 
   const {gl, viewport} = useThree();
@@ -28,9 +28,11 @@ const Island = ({isRotating, setIsRotating, ...props}) => {
     event.stopPropagation();
     event.preventDefault();
     setIsRotating(true);
-
+    
     const clientX = event.touches ? event.touches[0].clientX : event.clientX;
     lastX.current = clientX;
+
+
   };
   const handlePointerUp = (event) => {
     event.stopPropagation();

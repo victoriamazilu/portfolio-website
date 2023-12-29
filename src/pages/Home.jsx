@@ -9,6 +9,7 @@ import Plane from "../models/Plane"
 
 const Home = () => {
   const [isRotating, setIsRotating] = useState(false);
+  const [currentStage, setCurrentStage] = useState(1);
 
   const adjustIsland = () => {
     let screenScale= null;
@@ -16,9 +17,9 @@ const Home = () => {
     let rotation = [0.1, 4.7, 0];
 
     if(window.innerWidth < 768){
-      screenScale = [0.9, 0.9, 0.9];
+      screenScale = [0.8, 0.8, 0.8];
     } else{
-      screenScale = [1, 1, 1];
+      screenScale = [0.9, 0.9, 0.9];
     }
 
     return [screenScale, screenPos, rotation];
@@ -29,11 +30,11 @@ const Home = () => {
     let screenPos = null;
 
     if(window.innerWidth < 768){
-      screenScale = [1.5, 1.5, 1.5];
-      screenPos = [0, -1.5, 0];
+      screenScale = [1.3, 1.3, 1.3];
+      screenPos = [0, -1, 0];
     } else{
-      screenScale = [3, 3, 3];
-      screenPos= [0, -4, -4];
+      screenScale = [2.5, 2.5, 2.5];
+      screenPos= [0, -5, -5];
     }
 
     return [screenScale, screenPos];
@@ -51,18 +52,22 @@ const Home = () => {
       <Canvas 
         className={`w-full h-screen bg-transparent ${isRotating ? 'cursor-grabbing': 'cursor-grab'}`} camera={{near: 0.1, far: 1000}}>
         <Suspense fallback={<Loader />}>
-          <directionalLight postion={[1, 1, 1]} intensity={2} />
+          <directionalLight postion={[1, 1, 1]} intensity={1} />
           <ambientLight intensity={0.5}/>
           <hemisphereLight skyColor="#b1e1ff" groundColor="#000000" intensity={1}/>
+          <pointLight/>
 
           <Bird />
-          <Sky />
+          <Sky 
+            isRotating={isRotating}
+          />
           <Island 
             scale={islandScale}
             position={islandPos}
             rotation={islandRot}
             isRotating={isRotating}
             setIsRotating={setIsRotating}
+            setCurrentStage={setCurrentStage}
           />
           <Plane 
             planeScale = {planeScale}
