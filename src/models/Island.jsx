@@ -22,7 +22,6 @@ const Island = ({isRotating, setIsRotating, setCurrentStage, ...props}) => {
   const rotationSpeed = useRef(0);
   const dampingFactor = 0.95;
 
-
   //Mouse/Touch
   const handlePointerDown = (event) => {
     event.stopPropagation();
@@ -88,13 +87,13 @@ const Island = ({isRotating, setIsRotating, setCurrentStage, ...props}) => {
       // Set the current stage based on the island's orientation
       const normalizedRotation = ((rotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
 
-      if (normalizedRotation >= 5.45 && normalizedRotation <= 5.85) {
-        setCurrentStage(4);
-      } else if (normalizedRotation >= 0.85 && normalizedRotation <= 1.3) {
-        setCurrentStage(3);
-      } else if (normalizedRotation >= 2.4 && normalizedRotation <= 2.6) {
+      if (normalizedRotation >= 0 && normalizedRotation < Math.PI / 2) {
         setCurrentStage(2);
-      } else if (normalizedRotation >= 4.25 && normalizedRotation <= 4.75) {
+      } else if (normalizedRotation >= Math.PI / 2 && normalizedRotation < Math.PI) {
+          setCurrentStage(3);
+      } else if (normalizedRotation >= Math.PI && normalizedRotation < 3 * Math.PI / 2) {
+        setCurrentStage(4);
+      } else if (normalizedRotation >= 3 * Math.PI / 2 && normalizedRotation <= 2 * Math.PI) {
         setCurrentStage(1);
       } else {
         setCurrentStage(null);
