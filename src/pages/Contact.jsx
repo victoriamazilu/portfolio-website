@@ -3,6 +3,8 @@ import emailjs from '@emailjs/browser'
 import {Canvas} from '@react-three/fiber'
 import Fox from '../models/Fox'
 import Loader from '../components/Loader'
+import useAlert from '../hooks/useAlert'
+import Alert from '../components/Alert'
 
 const Contact = () => {
   const formRef = useRef(null);
@@ -10,6 +12,8 @@ const Contact = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [currentAnimation, setCurrentAnimation] = useState('IDLE');
   
+  const {alert, showAlert, hideAlert} = useAlert();
+
   //Take key press event and updates all properties from form
   const handleChange = (event) => {
     setForm({ ...form, [event.target.name]: event.target.value})
@@ -36,20 +40,30 @@ const Contact = () => {
       import.meta.env.VITE_APP_EMAILJS_PUBLIC_KEY
     ).then(() => {
       setIsLoading(false);
+    
+      showAlert({show: true, text: 'Message sent successfully!', type: 'success'})
       
-      //SHOW ALERT SUCCESS, HIDE ALERT
-      setForm({name: '', email: '', message: ''})
+      //Timeout after 3 seconds reset message and fox to idle
+      setTimeout(() => {
+        hideAlert();
+        setCurrentAnimation('idle');
+        setForm({name: '', email: '', message: ''});
+      }, [3000])
+      
     }).catch((error) => {
       setIsLoading(false);
       setCurrentAnimation('idle');
       console.log(error);
-      //SHOW ERROR MESS
-      setForm({name: '', email: '', message: ''})
+      
+      showAlert({show: true, text: 'Error during send. ', type: 'danger'})
+
     })
   };
 
   return (
     <section className="relative flex lg:flex-row flex-col max-container">
+      {alert.show && <Alert {...alert} />}
+
       <div className="flex-1 min-w-[50%] flex flex-col">
         <h1 className="head-text">Get in Touch</h1>
 
