@@ -111,7 +111,7 @@ body:has(.card[data-color="green"]:hover) {
   transform-origin: bottom right;
   transform: rotateZ(15deg);
   will-change: transform;
-  box-shadow: 16px 0 40px #e4e4e4;
+  box-shadow: 16px 0 40px #c1c1c1;
 }
 
 .block-container .btn-back-red {
@@ -155,6 +155,7 @@ body:has(.card[data-color="green"]:hover) {
   transform-style: preserve-3d;
   transform-origin: top left;
   overflow: hidden;
+  box-shadow: 16px 0 40px #ededed;
 }
 
 .block-container:hover > .btn-back {

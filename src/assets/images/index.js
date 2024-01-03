@@ -1,4 +1,4 @@
-import hero from './hero.jpg'
+import hero from './hero.jpeg'
 import meta from './meta.png'
 import shopify from './shopify.png'
 import starbucks from './starbucks.png'
