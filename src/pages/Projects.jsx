@@ -28,13 +28,18 @@ const Projects = () => {
             </div>
             <div className="mt-5 flex flex-col">
               <h4 className="text-2xl font-poppins font-semibold">{project.name}</h4>
+              {project.role && 
+                <h4 className="text-medium font-poppins">Role: {project.role}</h4>
+              }
               <p className="mt-2 text-slate-500">{project.description}</p>
-              <div className="mt-5 flex items-center gap-2 font-poppins">
+              {project.link && 
+                <div className="mt-5 flex items-center gap-2 font-poppins">
                 <Link to={project.link} target="_blank" rel="noopener noreferrer" className="font-semibold text-blue-600">
                   Live Link
                 </Link>
                 <img src={arrow} alt="arrow" className="w-4 h-4 object-contain"/>
-              </div>
+                </div>
+              }
             </div>
           </div>
         ))}

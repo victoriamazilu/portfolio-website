@@ -1,8 +1,10 @@
 import React from 'react'
-import {skills, experiences} from '../constants'
+import {skills, experiences, socialLinks} from '../constants'
 import {VerticalTimeline, VerticalTimelineElement} from 'react-vertical-timeline-component';
 import 'react-vertical-timeline-component/style.min.css';
 import CTA from '../components/CTA';
+import { Link } from "react-router-dom";
+
 
 const About = () => {
   return (
@@ -11,12 +13,13 @@ const About = () => {
       <div className="mt-5 flex flex-col cap-3 text-slate-500">
         <p>Software Engineer from Toronto currently in my first year at the University of Waterloo!  My enthusiasm for learning and innovating fuels my love for tackling challenging problems with determination and enthusiasm.</p>
       </div>
+
       <div className="py-10 flex flex-col">
         <h3 className="subhead-text">My Skills</h3>
-
+        {/* Skill boxes */}
         <div className="mt-16 flex flex-wrap gap-12">
           {skills.map((skill) => (
-            <div className="block-container w-20 h-20">
+            <div className="block-container w-20 h-20" key={skill.name}>
               <div className="btn-back rounded-xl shadow-lg"/>
               <div className="btn-front rounded-xl flex justify-center items-center">
                 <img 
@@ -25,6 +28,7 @@ const About = () => {
                   className="w-1/2 h-1/2 object-contain"
                 />
               </div>
+              <p className="text-sm text-center mt-20 text-slate-500">{skill.name}</p>
             </div>
           ))}
         </div>
@@ -63,13 +67,16 @@ const About = () => {
                   <h3 className="text-black text-xl font-poppins font-semibold">{experience.title}</h3>
                   <p className="text-black-500 font-medium font-base" style={{margin:0}}>{experience.company_name}</p>
                 </div>
-                <ul className="my-5 list-disc ml-5 space-y-2">
-                  {experience.points.map((point, index) => (
-                    <li className="text-black-500/50 font-normal pl-1 text-sm" key={`experience-point-${index}`}>
-                      {point}
-                    </li>
-                  ))}
-                </ul>
+                <div className="my-5 list-disc ml-5 space-y-2">
+                  {experience.company_name === "FYI101" && <h4 className="text-black-500/50 font-normal pl-1 text-medium">Objectives:</h4>}
+                  <ul className="my-5 list-disc ml-5 space-y-2">
+                    {experience.points.map((point, index) => (
+                      <li className="text-black-500/50 font-normal pl-1 text-sm" key={`experience-point-${index}`}>
+                        {point}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </VerticalTimelineElement>
             ))}
           </VerticalTimeline>
