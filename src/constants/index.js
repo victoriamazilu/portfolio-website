@@ -153,7 +153,7 @@ export const socialLinks = [
     {
         name: 'LinkedIn',
         iconUrl: linkedin,
-        link: 'www.linkedin.com/in/victoriamazilu/',
+        link: 'https://www.linkedin.com/in/victoriamazilu/',
     }
 ];
 

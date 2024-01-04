@@ -14,9 +14,28 @@ const About = () => {
         <p>Software Engineer from Toronto currently in my first year at the University of Waterloo!  My enthusiasm for learning and innovating fuels my love for tackling challenging problems with determination and enthusiasm.</p>
       </div>
 
+      {/* Social links */}
+      <div className="flex justify-center items-center mt-8">
+        {socialLinks.map((social, index) => (
+          <a
+            key={index}
+            href={social.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mx-2"
+          >
+            <img
+              src={social.iconUrl}
+              alt={social.name}
+              className="w-8 h-8 object-contain" // Adjust size as needed
+            />
+          </a>
+        ))}
+      </div>
+
+      {/* Skill boxes */}
       <div className="py-10 flex flex-col">
         <h3 className="subhead-text">My Skills</h3>
-        {/* Skill boxes */}
         <div className="mt-16 flex flex-wrap gap-12">
           {skills.map((skill) => (
             <div className="block-container w-20 h-20" key={skill.name}>
@@ -41,7 +60,7 @@ const About = () => {
         </div>
 
         {/* Imported React timeline component with styling */}
-        <div className="mt-8 flex">
+        <div className="flex">
           <VerticalTimeline>
             {experiences.map((experience) => (
               <VerticalTimelineElement 
