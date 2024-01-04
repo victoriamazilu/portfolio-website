@@ -1,8 +1,13 @@
-# React + Vite
+## Overview
+This project, my portfolio, is a JavaScript web application built with React. It showcases a portfolio of work with an emphasis on interactive 3D elements, offering users a unique and engaging experience.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Description
+The portfolio is designed to be a dynamic and visually appealing showcase of work experience, projects, and skills. It employs React for its responsive UI components and leverages the power of Three.js for rendering complex 3D graphics. The application is structured to provide an immersive user experience, with smooth navigation and interactive elements that highlight the developer's technical prowess and creativity.
 
-Currently, two official plugins are available:
+## Key Features
+- **Interactive 3D Graphics**: Utilizing Three.js libraries for advanced 3D effects.
+- **Responsive Design**: Built with TailwindCSS for a flexible, mobile-first design.
+- **Navigation and Routing**: Employing React Router for seamless page transitions.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Development Environment
+- **Vite**: For efficient development server management and build optimization.
