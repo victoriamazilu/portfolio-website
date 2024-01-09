@@ -3,12 +3,19 @@ import {projects} from '../constants'
 import { Link } from "react-router-dom";
 import { arrow } from '../assets/icons';
 import CTA from '../components/CTA';
+import BackButton from '../components/BackButton';
 
 
 const Projects = () => {
   return (
     <section className="max-container">
-      <h1 className="head-text">My <span className="blue-gradient_text font-semibold drop-shadow">Projects</span></h1>
+      <div className="flex justify-between">
+        <h1 className="head-text">My <span className="blue-gradient_text font-semibold drop-shadow">Projects</span></h1>
+        <div className="flex justify-end items-center">
+          <BackButton />
+        </div>
+      </div>
+
       <div className="mt-5 flex flex-col cap-3 text-slate-500">
         <p>Recently, I've been sharpening my skills through personal projects. Here are a few of the projects I've been working on, each presenting unique challenges and learning opportunities.  Lots more to come in the future!</p>
       </div>

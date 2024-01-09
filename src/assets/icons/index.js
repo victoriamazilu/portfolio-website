@@ -18,6 +18,7 @@ import blender from './blender.svg'
 import figma from './figma.svg'
 import threejs from './threejs.svg'
 import showerscribe from './showerscribe.svg'
+import close from './close.svg'
 
 export {
     css,
@@ -40,4 +41,5 @@ export {
     figma,
     threejs,
     showerscribe,
+    close
 }

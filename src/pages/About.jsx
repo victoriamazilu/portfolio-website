@@ -3,13 +3,17 @@ import {skills, experiences, socialLinks} from '../constants'
 import {VerticalTimeline, VerticalTimelineElement} from 'react-vertical-timeline-component';
 import 'react-vertical-timeline-component/style.min.css';
 import CTA from '../components/CTA';
-import { Link } from "react-router-dom";
-
+import BackButton from '../components/BackButton';
 
 const About = () => {
   return (
     <section className="max-container">
-      <h1 className="head-text">Hi, I'm <span className="blue-gradient_text font-semibold drop-shadow">Victoria!</span> 👋</h1>
+      <div className="flex justify-between">
+        <h1 className="head-text">Hi, I'm <span className="blue-gradient_text font-semibold drop-shadow">Victoria!</span> 👋</h1>
+        <div className="flex justify-end items-center">
+          <BackButton />
+        </div>
+      </div>
       <div className="mt-5 flex flex-col cap-3 text-slate-500">
         <p>Software Engineer from Toronto currently in my first year at the University of Waterloo!  My enthusiasm for learning and innovating fuels my love for tackling challenging problems with determination and enthusiasm.</p>
       </div>
