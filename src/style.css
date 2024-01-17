@@ -127,7 +127,7 @@ body:has(.card[data-color="green"]:hover) {
 }
 
 .block-container .btn-back-blue {
-  background: linear-gradient(135deg, #0061ff -20%, #60efff 120%);
+  background: linear-gradient(135deg, #8faad5 -20%, #60efff 120%);
 }
 
 .block-container .btn-back-orange {
@@ -138,8 +138,8 @@ body:has(.card[data-color="green"]:hover) {
   background: linear-gradient(135deg, #e81cff -20%, #40c9ff 120%);
 }
 
-.block-container .btn-back-black {
-  background: linear-gradient(135deg, #0a1647 -20%, #e4e7e4 120%);
+.block-container .btn-back-gray {
+  background: linear-gradient(135deg, #686c7d -20%, #e4e7e4 120%);
 }
 
 .block-container .btn-front {

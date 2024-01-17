@@ -19,20 +19,45 @@ import {
     figma,
     threejs,
     showerscribe,
+    nextjs,
+    mongodb,
+    typescript,
+    swarm,
 } from "../assets/icons";
+import icon from "../assets/icon.png";
 
 export const skills = [
+    {
+        imageUrl: typescript,
+        name: "TypeScript",
+    },
+    {
+        imageUrl: javascript,
+        name: "JavaScript",
+    },
+    {
+        imageUrl: nextjs,
+        name: "Next.js",
+    },
+    {
+        imageUrl: react,
+        name: "React",
+    },
     {
         imageUrl: java,
         name: "Java",
     },
     {
         imageUrl: c,
-        name: "C",
+        name: "C/C++",
     },
     {
-        imageUrl: javascript,
-        name: "JavaScript",
+        imageUrl: python,
+        name: "Python",
+    },
+    {
+        imageUrl: mongodb,
+        name: "MongoDB",
     },
     {
         imageUrl: css,
@@ -43,20 +68,8 @@ export const skills = [
         name: "HTML",
     },
     {
-        imageUrl: python,
-        name: "Python",
-    },
-    {
         imageUrl: git,
         name: "Git",
-    },
-    {
-        imageUrl: github,
-        name: "GitHub",
-    },
-    {
-        imageUrl: react,
-        name: "React",
     },
     {
         imageUrl: threejs,
@@ -159,11 +172,25 @@ export const socialLinks = [
 
 export const projects = [
     {
+        iconUrl: swarm,
+        theme: 'btn-back-yellow',
+        name: 'Swarm',
+        description: 'Swarm is a full-stack social web application designed to connect and build communities. It\'s a platform for sharing, engaging in discussions, and interacting with like minds.        ',
+        link: 'https://github.com/victoriamazilu/Swarm',
+    },
+    {
+        iconUrl: icon,
+        theme: 'btn-back-blue',
+        name: 'This website!',
+        description: 'Everything you see right now! Built with Javascript, React, and much more...',
+        link: 'https://github.com/victoriamazilu/Personal-Website',
+    },
+    {
         iconUrl: showerscribe,
-        theme: 'btn-back-red',
+        theme: 'btn-back-gray',
         name: 'ShowerScribe',
         role: 'Frontend Developer',
-        description: 'Developed ShowerScribe, a voice-recording device for shower thoughts, resulting in enhanced idea capture, with features for transcription, LLM recaps, all contained in a user-friendly web app.',
-        link: '',
+        description: 'Shower Scribe is a waterproof device that captures your shower thoughts for those eureka moments you just can\'t afford to forget. It instantly transcribes, auto-titles, groups, and provides LLM recaps for each recording, which is all displayed on a user-friendly web app.',
+        link: 'https://github.com/victoriamazilu/Shower-Scribe',
     },
 ];

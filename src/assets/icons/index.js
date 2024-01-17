@@ -17,8 +17,12 @@ import java from './java.svg'
 import blender from './blender.svg'
 import figma from './figma.svg'
 import threejs from './threejs.svg'
-import showerscribe from './showerscribe.svg'
+import showerscribe from './showerscribe.png'
 import close from './close.svg'
+import nextjs from './nextjs.svg'
+import mongodb from './mongodb.svg'
+import typescript from './typescript.svg'
+import swarm from './swarm.png'
 
 export {
     css,
@@ -41,5 +45,9 @@ export {
     figma,
     threejs,
     showerscribe,
-    close
+    close,
+    nextjs,
+    mongodb,
+    typescript,
+    swarm
 }
