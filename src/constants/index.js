@@ -179,18 +179,18 @@ export const projects = [
         link: 'https://github.com/victoriamazilu/Swarm',
     },
     {
+        iconUrl: showerscribe,
+        theme: 'btn-back-gray',
+        name: 'Shower Scribe',
+        role: 'Frontend Developer',
+        description: 'Shower Scribe is a waterproof device that captures your shower thoughts for those eureka moments you just can\'t afford to forget. It instantly transcribes, auto-titles, groups, and provides LLM recaps for each recording, which is all displayed on a user-friendly web app.',
+        link: 'https://github.com/victoriamazilu/Shower-Scribe',
+    },
+    {
         iconUrl: icon,
         theme: 'btn-back-blue',
         name: 'This website!',
         description: 'Everything you see right now! Built with Javascript, React, and much more...',
         link: 'https://github.com/victoriamazilu/Personal-Website',
-    },
-    {
-        iconUrl: showerscribe,
-        theme: 'btn-back-gray',
-        name: 'ShowerScribe',
-        role: 'Frontend Developer',
-        description: 'Shower Scribe is a waterproof device that captures your shower thoughts for those eureka moments you just can\'t afford to forget. It instantly transcribes, auto-titles, groups, and provides LLM recaps for each recording, which is all displayed on a user-friendly web app.',
-        link: 'https://github.com/victoriamazilu/Shower-Scribe',
     },
 ];
