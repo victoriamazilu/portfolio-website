@@ -97,7 +97,7 @@ body:has(.card[data-color="green"]:hover) {
 .block-container {
   position: relative;
   transition: 250ms;
-  perspective: 400px;
+  perspective: 500px;
 }
 
 .block-container .btn-back {
