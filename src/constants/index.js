@@ -1,4 +1,4 @@
-import { fyi, blueblood, risetothrive, hci } from "../assets/images";
+import { oncall, blueblood, risetothrive, hci } from "../assets/images";
 import {
     contact,
     css,
@@ -104,15 +104,11 @@ export const skills = [
 export const experiences = [
     {
         title: "Upcoming! Full-Stack Developer",
-        company_name: "FYI101",
-        icon: fyi,
+        company_name: "OnCall Health",
+        icon: oncall,
         iconBg: "#accbe1",
-        date: "January 2024 - Current",
-        points: [
-            "Build and implement full-stack solutions that are highly scalable, driving positive user experiences and measurable growth, while ensuring optimal performance.",
-            "Lead the development of new features and infrastructure, adapting to evolving business needs, to foster innovation and integration into existing systems.",
-            "Engage in all phases of software development, providing architectural guidance and focusing on optimization, maintaining high standards in code quality and design.",
-        ],
+        date: "May 2024 - August 2024",
+        points: [],
     },
     {
         title: "STEM Tutor",
@@ -154,38 +150,41 @@ export const experiences = [
 
 export const socialLinks = [
     {
-        name: 'GitHub',
+        name: "GitHub",
         iconUrl: github,
-        link: 'https://github.com/victoriamazilu',
+        link: "https://github.com/victoriamazilu",
     },
     {
-        name: 'LinkedIn',
+        name: "LinkedIn",
         iconUrl: linkedin,
-        link: 'https://www.linkedin.com/in/victoriamazilu/',
-    }
+        link: "https://www.linkedin.com/in/victoriamazilu/",
+    },
 ];
 
 export const projects = [
     {
         iconUrl: swarm,
-        theme: 'btn-back-yellow',
-        name: 'Swarm',
-        description: 'Swarm is a full-stack social web application designed to connect and build communities. It\'s a platform for sharing, engaging in discussions, and interacting with like minds.        ',
-        link: 'https://github.com/victoriamazilu/Swarm',
+        theme: "btn-back-yellow",
+        name: "Swarm",
+        description:
+            "Swarm is a full-stack social web application designed to connect and build communities. It's a platform for sharing, engaging in discussions, and interacting with like minds.        ",
+        link: "https://github.com/victoriamazilu/Swarm",
     },
     {
         iconUrl: showerscribe,
-        theme: 'btn-back-gray',
-        name: 'Shower Scribe',
-        role: 'Frontend Developer',
-        description: 'Shower Scribe is a waterproof device that captures your shower thoughts for those eureka moments you just can\'t afford to forget. It instantly transcribes, auto-titles, groups, and provides LLM recaps for each recording, which is all displayed on a user-friendly web app.',
-        link: 'https://github.com/victoriamazilu/Shower-Scribe',
+        theme: "btn-back-gray",
+        name: "Shower Scribe",
+        role: "Frontend Developer",
+        description:
+            "Shower Scribe is a waterproof device that captures your shower thoughts for those eureka moments you just can't afford to forget. It instantly transcribes, auto-titles, groups, and provides LLM recaps for each recording, which is all displayed on a user-friendly web app.",
+        link: "https://github.com/victoriamazilu/Shower-Scribe",
     },
     {
         iconUrl: icon,
-        theme: 'btn-back-blue',
-        name: 'This website!',
-        description: 'Everything you see right now! Built with Javascript, React, and much more...',
-        link: 'https://github.com/victoriamazilu/Personal-Website',
+        theme: "btn-back-blue",
+        name: "This website!",
+        description:
+            "Everything you see right now! Built with Javascript, React, and much more...",
+        link: "https://github.com/victoriamazilu/Personal-Website",
     },
 ];
