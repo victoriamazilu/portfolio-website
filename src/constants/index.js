@@ -103,7 +103,7 @@ export const skills = [
 
 export const experiences = [
     {
-        title: "Upcoming! Full-Stack Developer",
+        title: "Full-Stack Developer",
         company_name: "OnCall Health",
         icon: oncall,
         iconBg: "#accbe1",
