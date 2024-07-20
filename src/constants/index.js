@@ -12,10 +12,8 @@ import {
     python,
     flask,
     bootstrap,
-    vite,
     c,
     java,
-    blender,
     figma,
     threejs,
     showerscribe,
@@ -76,10 +74,6 @@ export const skills = [
         name: "Three.js",
     },
     {
-        imageUrl: vite,
-        name: "Vite",
-    },
-    {
         imageUrl: flask,
         name: "Flask",
     },
@@ -90,10 +84,6 @@ export const skills = [
     {
         imageUrl: bootstrap,
         name: "Bootstrap",
-    },
-    {
-        imageUrl: blender,
-        name: "Blender",
     },
     {
         imageUrl: figma,
