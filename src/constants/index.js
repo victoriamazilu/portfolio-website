@@ -11,7 +11,7 @@ import {
     tailwindcss,
     python,
     flask,
-    bootstrap,
+    django,
     c,
     java,
     figma,
@@ -54,6 +54,10 @@ export const skills = [
         name: "Python",
     },
     {
+        imageUrl: django,
+        name: "Django",
+    },
+    {
         imageUrl: mongodb,
         name: "MongoDB",
     },
@@ -82,10 +86,6 @@ export const skills = [
         name: "Tailwind CSS",
     },
     {
-        imageUrl: bootstrap,
-        name: "Bootstrap",
-    },
-    {
         imageUrl: figma,
         name: "Figma",
     },
@@ -98,7 +98,11 @@ export const experiences = [
         icon: oncall,
         iconBg: "#accbe1",
         date: "May 2024 - August 2024",
-        points: [],
+        points: [
+            "Engineered full-stack features with Django REST, Python, React, and JavaScript, using Datadog for logging, and enabled platform sync through GMP integration.",
+            "Built the foundation of new platform integration which contributed to a 16% quarterly revenue increase, by implementing core models, serializers, and views to enable a seamless migration.",
+            "Improved platform performance and achieved a 7x reduction in query time by optimizing queries, reducing joins, leveraging subqueries, and implementing a custom utility function.",
+        ],
     },
     {
         title: "STEM Tutor",
@@ -122,18 +126,6 @@ export const experiences = [
             "Facilitated team communication by presenting design concepts to the founder, leading to a 95% approval rate of ideas.",
             "Developed a workshop structure about company purpose using Figma, which fostered productive discussions on future endeavours.",
             "Enhanced the company website's effectiveness by conducting thorough analysis on key areas for strength and potential growth.",
-        ],
-    },
-    {
-        title: "Server Assistant",
-        company_name: "BlueBlood Steakhouse",
-        icon: blueblood,
-        iconBg: "#ffffff",
-        date: "April 2021 - September 2023",
-        points: [
-            "Fostered a fine-dining environment by maintaining a polite and professional demeanour, resulting in enhanced guest satisfaction.",
-            "Achieved a score of 100% on the server knowledge exam by mastering over 150 menu items, demonstrating commitment and ambition.",
-            "Trained 5+ new hires which led them to achieve 90%+ scores on the server knowledge exam, leveraging my attention to detail, communication, and leadership skills.",
         ],
     },
 ];

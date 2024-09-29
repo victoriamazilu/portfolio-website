@@ -10,7 +10,7 @@ import arrow from "./arrow.svg";
 import contact from "./contact.svg";
 import python from "./python.svg";
 import flask from "./flask.svg";
-import bootstrap from "./bootstrap.svg";
+import django from "./django.svg";
 import c from "./c.svg";
 import java from "./java.svg";
 import figma from "./figma.svg";
@@ -35,7 +35,7 @@ export {
     contact,
     python,
     flask,
-    bootstrap,
+    django,
     c,
     java,
     figma,
