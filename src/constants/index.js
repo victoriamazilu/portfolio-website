@@ -1,4 +1,4 @@
-import { oncall, blueblood, risetothrive, hci } from "../assets/images";
+import { realitylabs, oncall, risetothrive, hci } from "../assets/images";
 import {
     contact,
     css,
@@ -92,6 +92,18 @@ export const skills = [
 ];
 
 export const experiences = [
+    {
+        title: "Software Developer",
+        company_name: "Waterloo Reality Labs",
+        icon: realitylabs,
+        iconBg: "#45443f",
+        date: "September 2024 - Present",
+        points: [
+            "Trained a PyTorch feedforward neural network, achieving 99.98% accuracy in classifying RGB colors as warm or cool, by generating synthetic data and using backpropagation.",
+            "Implemented hand gesture controls for a Meta Quest VR app using the Meta SDK and XR Simulator.",
+            "Developed 3D Roll-a-Ball game in Unity to learn GameObjects, rigidbody physics, and scripting in C#.",
+        ],
+    },
     {
         title: "Full-Stack Developer",
         company_name: "OnCall Health",
