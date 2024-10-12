@@ -1,4 +1,10 @@
-import { realitylabs, oncall, risetothrive, hci } from "../assets/images";
+import {
+    blockchain,
+    realitylabs,
+    oncall,
+    risetothrive,
+    hci,
+} from "../assets/images";
 import {
     contact,
     css,
@@ -92,6 +98,14 @@ export const skills = [
 ];
 
 export const experiences = [
+    {
+        title: "Full-Stack Software Developer",
+        company_name: "Waterloo Blockchain",
+        icon: blockchain,
+        iconBg: "#faeded", //"#ffe8e8",
+        date: "October 2024 - Present",
+        points: ["Coming soon!"],
+    },
     {
         title: "Software Developer",
         company_name: "Waterloo Reality Labs",
