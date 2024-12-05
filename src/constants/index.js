@@ -193,6 +193,6 @@ export const projects = [
         name: "This website!",
         description:
             "Everything you see right now! Built with Javascript, React, and much more...",
-        link: "https://github.com/victoriamazilu/Personal-Website",
+        link: "https://github.com/victoriamazilu/portfolio-website",
     },
 ];
