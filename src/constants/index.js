@@ -175,7 +175,7 @@ export const projects = [
         theme: "btn-back-yellow",
         name: "Swarm",
         description:
-            "Swarm is a full-stack social web application designed to connect and build communities. It's a platform for sharing, engaging in discussions, and interacting with like minds. Live version at https://swarm.vmazilu.com/",
+            "Swarm is a full-stack social web application designed to connect and build communities. It's a platform for sharing, engaging in discussions, and interacting with like minds. Live version at https://swarm.vmazilu.ca/",
         link: "https://github.com/victoriamazilu/Swarm",
     },
     {

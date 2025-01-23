@@ -13,4 +13,4 @@ The portfolio is designed to be a dynamic and visually appealing showcase of wor
 - **Vite**: For efficient development server management and build optimization.
 
 ## Live Version
-Experience the portfolio live at [vmazilu.com](http://vmazilu.com). Here, you can interact with the 3D elements and navigate through the projects showcased in real-time.
+Experience the portfolio live at [vmazilu.ca](http://vmazilu.ca). Here, you can interact with the 3D elements and navigate through the projects showcased in real-time.
