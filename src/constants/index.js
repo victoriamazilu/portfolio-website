@@ -102,9 +102,11 @@ export const experiences = [
         title: "Full-Stack Software Developer",
         company_name: "Waterloo Blockchain",
         icon: blockchain,
-        iconBg: "#faeded", //"#ffe8e8",
-        date: "October 2024 - Present",
-        points: ["Coming soon!"],
+        iconBg: "#faeded",
+        date: "October 2024 - December 2024",
+        points: [
+            "Developed an end-to-end Blockchain Job Board platform by implementing a React frontend with TypeScript and integrating a Postgres database.",
+        ],
     },
     {
         title: "Software Developer",
