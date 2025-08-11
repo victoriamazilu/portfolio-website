@@ -8,14 +8,21 @@ Title: Floating Island
 
 import { useRef, useEffect } from "react";
 import { useGLTF } from "@react-three/drei";
-import { useFrame, useThree} from '@react-three/fiber';
-import { a } from '@react-spring/three';
-import islandScene from '../assets/3d/island.glb';
+import { useFrame, useThree } from "@react-three/fiber";
+import { a } from "@react-spring/three";
+import islandScene from "../assets/3d/island.glb";
 
-const Island = ({isRotating, setIsRotating, setCurrentStage, ...props}) => {
+const Island = ({
+  isRotating,
+  setIsRotating,
+  setCurrentStage,
+  setRotationSpeed,
+  onFirstInteraction,
+  ...props
+}) => {
   const islandRef = useRef();
   const scene = useGLTF(islandScene);
-  const {gl, viewport} = useThree();
+  const { gl, viewport } = useThree();
   const { nodes, materials } = useGLTF(islandScene);
 
   const lastX = useRef(0);
@@ -27,11 +34,10 @@ const Island = ({isRotating, setIsRotating, setCurrentStage, ...props}) => {
     event.stopPropagation();
     event.preventDefault();
     setIsRotating(true);
-    
+    if (onFirstInteraction) onFirstInteraction();
+
     const clientX = event.touches ? event.touches[0].clientX : event.clientX;
     lastX.current = clientX;
-
-
   };
   const handlePointerUp = (event) => {
     event.stopPropagation();
@@ -42,14 +48,15 @@ const Island = ({isRotating, setIsRotating, setCurrentStage, ...props}) => {
     event.stopPropagation();
     event.preventDefault();
 
-    if(isRotating){
+    if (isRotating) {
       const clientX = event.touches ? event.touches[0].clientX : event.clientX;
       const delta = (clientX - lastX.current) / viewport.width;
-  
-      islandRef.current.rotation.y += delta * 0.01 * Math.PI; 
+
+      islandRef.current.rotation.y += delta * 0.01 * Math.PI;
       lastX.current = clientX;
-      rotationSpeed.current = delta * 0.01 * Math.PI;    
-    } 
+      rotationSpeed.current = delta * 0.01 * Math.PI;
+      setRotationSpeed(rotationSpeed.current);
+    }
   };
 
   //Keys
@@ -69,44 +76,60 @@ const Island = ({isRotating, setIsRotating, setCurrentStage, ...props}) => {
 
   const handleKeyDown = (event) => {
     const rotationIncrement = 0.01;
-    if(event.key === "ArrowLeft") {
-      if(!isRotating) setIsRotating(true);
-      
+    if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+      if (onFirstInteraction) onFirstInteraction();
+      if (!isRotating) setIsRotating(true);
+    }
+
+    if (event.key === "ArrowLeft") {
       islandRef.current.rotation.y += rotationIncrement;
-    } else if(event.key === "ArrowRight") {
-      if(!isRotating) setIsRotating(true);
-  
+      setRotationSpeed(rotationIncrement);
+    } else if (event.key === "ArrowRight") {
       islandRef.current.rotation.y -= rotationIncrement;
+      setRotationSpeed(-rotationIncrement);
     }
   };
   const handleKeyUp = (event) => {
-    if(event.key === "ArrowLeft" || event.key === "ArrowRight") {
+    if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
       setIsRotating(false);
     }
   };
 
   useFrame(() => {
-    if(!isRotating){ //Apply damping factor, make plane roll smoother
+    if (!isRotating) {
+      //Apply damping factor, make plane roll smoother
       rotationSpeed.current *= dampingFactor;
 
-      if(Math.abs(rotationSpeed.current) < 0.001) {
+      if (Math.abs(rotationSpeed.current) < 0.001) {
         rotationSpeed.current = 0;
       }
 
       islandRef.current.rotation.y += rotationSpeed.current;
-    } else{ //if it is rotating we must normalize the rotation value to ensure its in the interval [0, 2PI]
+      setRotationSpeed(rotationSpeed.current);
+    } else {
+      //if it is rotating we must normalize the rotation value to ensure its in the interval [0, 2PI]
       const rotation = islandRef.current.rotation.y;
 
       // Set the current stage based on the island's orientation
-      const normalizedRotation = ((rotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+      const normalizedRotation =
+        ((rotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
 
       if (normalizedRotation >= 0 && normalizedRotation < Math.PI / 2) {
         setCurrentStage(2);
-      } else if (normalizedRotation >= Math.PI / 2 && normalizedRotation < Math.PI) {
-          setCurrentStage(3);
-      } else if (normalizedRotation >= Math.PI && normalizedRotation < 3 * Math.PI / 2) {
+      } else if (
+        normalizedRotation >= Math.PI / 2 &&
+        normalizedRotation < Math.PI
+      ) {
+        setCurrentStage(3);
+      } else if (
+        normalizedRotation >= Math.PI &&
+        normalizedRotation < (3 * Math.PI) / 2
+      ) {
         setCurrentStage(4);
-      } else if (normalizedRotation >= 3 * Math.PI / 2 && normalizedRotation <= 2 * Math.PI) {
+      } else if (
+        normalizedRotation >= (3 * Math.PI) / 2 &&
+        normalizedRotation <= 2 * Math.PI
+      ) {
         setCurrentStage(1);
       } else {
         setCurrentStage(null);
@@ -114,763 +137,769 @@ const Island = ({isRotating, setIsRotating, setCurrentStage, ...props}) => {
     }
   });
 
-  useEffect (() => {
+  useEffect(() => {
     const canvas = gl.domElement;
-    canvas.addEventListener('pointerdown', handlePointerDown);
-    canvas.addEventListener('pointerup', handlePointerUp);
-    canvas.addEventListener('pointermove', handlePointerMove);
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
+    canvas.addEventListener("pointerdown", handlePointerDown);
+    canvas.addEventListener("pointerup", handlePointerUp);
+    canvas.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
 
     return () => {
-      canvas.removeEventListener('pointerdown', handlePointerDown);
-      canvas.removeEventListener('pointerup', handlePointerUp);
-      canvas.removeEventListener('pointermove', handlePointerMove);
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    }
-  }, [gl, handlePointerDown, handlePointerUp, handlePointerMove, handleKeyDown, handleKeyUp]);
+      canvas.removeEventListener("pointerdown", handlePointerDown);
+      canvas.removeEventListener("pointerup", handlePointerUp);
+      canvas.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, [
+    gl,
+    handlePointerDown,
+    handlePointerUp,
+    handlePointerMove,
+    handleKeyDown,
+    handleKeyUp,
+  ]);
 
   return (
-    <a.group ref={islandRef} {...props} >
+    <a.group ref={islandRef} {...props}>
       <mesh
-            geometry={nodes.defaultMaterial146.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial143.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial144.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial145.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial077.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial136.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial142.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial133.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial132.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial131.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial130.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial129.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial128.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial127.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial126.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial125.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial124.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial141.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial123.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial122.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial121.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial120.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial119.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial118.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial117.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial116.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial115.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial114.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial140.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial113.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial112.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial111.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial110.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial109.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial108.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial107.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial106.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial105.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial104.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial139.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial103.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial102.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial101.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial100.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial099.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial098.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial097.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial096.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial095.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial094.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial138.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial093.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial078.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial137.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial135.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial134.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial047.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial048.geometry}
-            material={materials["layeredShader1SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial091.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial092.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial087.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial086.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial085.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial084.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial090.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial082.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial081.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial080.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial079.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial076.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial075.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial074.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial073.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial072.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial089.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial071.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial070.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial069.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial068.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial067.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial066.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial065.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial064.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial063.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial062.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial061.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial060.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial059.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial058.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial057.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial056.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial055.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial054.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial053.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial052.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial051.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial050.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial049.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial088.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial001.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial002.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial003.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial004.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial005.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial006.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial007.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial008.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial009.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial010.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial011.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial012.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial013.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial014.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial015.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial016.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial017.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial018.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial046.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial019.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial020.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial021.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial022.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial023.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial024.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial025.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial026.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial027.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial028.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial029.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial030.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial031.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial032.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial033.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial034.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial035.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial036.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial037.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial038.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial039.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial040.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial041.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial042.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial043.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial044.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial045.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
-          <mesh
-            geometry={nodes.defaultMaterial083.geometry}
-            material={materials["lambert6SG.001"]}
-            position={[-57.036, 520.783, -166.498]}
-          />
+        geometry={nodes.defaultMaterial146.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial143.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial144.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial145.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial077.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial136.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial142.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial133.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial132.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial131.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial130.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial129.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial128.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial127.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial126.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial125.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial124.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial141.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial123.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial122.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial121.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial120.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial119.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial118.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial117.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial116.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial115.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial114.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial140.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial113.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial112.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial111.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial110.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial109.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial108.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial107.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial106.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial105.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial104.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial139.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial103.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial102.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial101.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial100.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial099.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial098.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial097.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial096.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial095.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial094.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial138.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial093.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial078.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial137.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial135.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial134.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial047.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial048.geometry}
+        material={materials["layeredShader1SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial091.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial092.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial087.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial086.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial085.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial084.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial090.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial082.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial081.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial080.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial079.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial076.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial075.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial074.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial073.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial072.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial089.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial071.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial070.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial069.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial068.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial067.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial066.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial065.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial064.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial063.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial062.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial061.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial060.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial059.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial058.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial057.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial056.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial055.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial054.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial053.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial052.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial051.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial050.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial049.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial088.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial001.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial002.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial003.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial004.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial005.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial006.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial007.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial008.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial009.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial010.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial011.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial012.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial013.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial014.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial015.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial016.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial017.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial018.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial046.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial019.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial020.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial021.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial022.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial023.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial024.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial025.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial026.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial027.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial028.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial029.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial030.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial031.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial032.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial033.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial034.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial035.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial036.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial037.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial038.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial039.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial040.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial041.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial042.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial043.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial044.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial045.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
+      <mesh
+        geometry={nodes.defaultMaterial083.geometry}
+        material={materials["lambert6SG.001"]}
+        position={[-57.036, 520.783, -166.498]}
+      />
     </a.group>
-
   );
-}
+};
 
 export default Island;
