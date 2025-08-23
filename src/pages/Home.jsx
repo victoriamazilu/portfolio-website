@@ -14,6 +14,9 @@ const Home = () => {
   const [rotationSpeed, setRotationSpeed] = useState(0);
   const [showGestureHint, setShowGestureHint] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [planeOrbitRadius, setPlaneOrbitRadius] = useState(1.0);
+  const [planeVerticalOffset, setPlaneVerticalOffset] = useState(0);
+  const [planeCameraDepth, setPlaneCameraDepth] = useState(0);
 
   const adjustIsland = () => {
     let screenPos, screenScale;
@@ -48,18 +51,11 @@ const Home = () => {
   const [planeScale, planePos] = adjustPlane();
 
   useEffect(() => {
-    let timer;
     if (!hasInteracted) {
-      timer = setTimeout(() => {
-        if (!hasInteracted) {
-          setShowGestureHint(true);
-        }
-      }, 2000);
+      setShowGestureHint(true);
     } else {
       setShowGestureHint(false);
     }
-
-    return () => clearTimeout(timer);
   }, [hasInteracted]);
 
   const handleFirstInteraction = () => {
@@ -77,9 +73,11 @@ const Home = () => {
 
       {/* Gesture Hint Footer */}
       {showGestureHint && (
-        <div className="absolute bottom-36 left-0 right-0 z-10 flex items-center justify-center">
-          <div className="text-sm sm:text-base text-center neo-brutalism-blue py-2 px-6 text-white mx-10 opacity-90">
-            <span className="animate-pulse">Click and drag to move the island!</span>
+        <div className="absolute bottom-20 left-0 right-0 z-10 flex items-center justify-center">
+          <div className="text-sm sm:text-base text-center neo-brutalism-blue py-2 px-6 text-white mx-10 opacity-90 mb-10">
+          <span className="animate-pulse">Click and drag or use WASD to move the island!</span>
+            <br />
+            <span className="text-xs opacity-75">W: Up • S: Down • A: Out • D: In</span>
           </div>
         </div>
       )}
@@ -110,6 +108,9 @@ const Home = () => {
             setCurrentStage={setCurrentStage}
             setRotationSpeed={setRotationSpeed}
             onFirstInteraction={handleFirstInteraction}
+            setPlaneOrbitRadius={setPlaneOrbitRadius}
+            setPlaneVerticalOffset={setPlaneVerticalOffset}
+            setPlaneCameraDepth={setPlaneCameraDepth}
           />
           <Plane
             scale={planeScale}
@@ -117,6 +118,9 @@ const Home = () => {
             isRotating={isRotating}
             rotation={[0, 20, 0]}
             currentRotationSpeed={rotationSpeed}
+            orbitRadius={planeOrbitRadius}
+            verticalOffset={planeVerticalOffset}
+            cameraDepth={planeCameraDepth}
           />
           <GestureHint 
             visible={showGestureHint} 

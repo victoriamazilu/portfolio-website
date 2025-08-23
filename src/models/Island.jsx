@@ -6,7 +6,7 @@ Source: https://sketchfab.com/3d-models/floating-island-05041dc9277748c68bb2ff8c
 Title: Floating Island
 */
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useGLTF } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { a } from "@react-spring/three";
@@ -18,6 +18,9 @@ const Island = ({
   setCurrentStage,
   setRotationSpeed,
   onFirstInteraction,
+  setPlaneOrbitRadius,
+  setPlaneVerticalOffset,
+  setPlaneCameraDepth,
   ...props
 }) => {
   const islandRef = useRef();
@@ -28,6 +31,19 @@ const Island = ({
   const lastX = useRef(0);
   const rotationSpeed = useRef(0);
   const dampingFactor = 0.95;
+  
+  // Keyboard control state
+  const [keysPressed, setKeysPressed] = useState(new Set());
+  const keyboardRotationSpeed = useRef(0);
+  const keyboardVerticalSpeed = useRef(0);
+  const keyboardCameraDepthSpeed = useRef(0);
+  const planeOrbitRadius = useRef(1.0);
+  const planeVerticalOffset = useRef(0);
+  const planeCameraDepth = useRef(0);
+  const minOrbitRadius = 0.4;
+  const maxOrbitRadius = 2.5;
+  const maxVerticalOffset = 1.75;
+  const maxCameraDepth = 3.5;
 
   //Mouse/Touch
   const handlePointerDown = (event) => {
@@ -59,81 +75,201 @@ const Island = ({
     }
   };
 
-  //Keys
-  // const handleKeyDown = (event) => {
-  //   if(event.key === "ArrowLeft") {
-  //     if(!isRotating) setIsRotating(true);
-
-  //     islandRef.current.rotation.y += 0.005 * Math.PI;
-  //     rotationSpeed.current = 0.007;
-  //   } else if(event.key === "ArrowRight") {
-  //     if(!isRotating) setIsRotating(true);
-
-  //     islandRef.current.rotation.y -= 0.005 * Math.PI;
-  //     rotationSpeed.current = -0.007;
-  //   }
-  // };
 
   const handleKeyDown = (event) => {
-    const rotationIncrement = 0.01;
-    if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+    const key = event.key.toLowerCase();
+    const validKeys = ['w', 's', 'a', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'];
+    
+    if (validKeys.includes(key)) {
+      event.preventDefault();
       if (onFirstInteraction) onFirstInteraction();
+      
+      setKeysPressed(prev => {
+        const newSet = new Set(prev);
+        newSet.add(key);
+        return newSet;
+      });
+      
       if (!isRotating) setIsRotating(true);
     }
-
-    if (event.key === "ArrowLeft") {
-      islandRef.current.rotation.y += rotationIncrement;
-      setRotationSpeed(rotationIncrement);
-    } else if (event.key === "ArrowRight") {
-      islandRef.current.rotation.y -= rotationIncrement;
-      setRotationSpeed(-rotationIncrement);
-    }
   };
+  
   const handleKeyUp = (event) => {
-    if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
-      setIsRotating(false);
+    const key = event.key.toLowerCase();
+    const validKeys = ['w', 's', 'a', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'];
+    
+    if (validKeys.includes(key)) {
+      event.preventDefault();
+      
+      setKeysPressed(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(key);
+        return newSet;
+      });
+      
+      // Stop rotating if no movement keys are pressed
+      if (keysPressed.size <= 1) { // <= 1 because we haven't updated keysPressed yet
+        setIsRotating(false);
+      }
     }
   };
 
   useFrame(() => {
-    if (!isRotating) {
-      //Apply damping factor, make plane roll smoother
+    // Handle keyboard input with momentum
+    const forwardSpeed = 0.006;
+    const verticalSpeed = 0.02;
+    const cameraDepthSpeed = 0.05;
+    const keyboardDampingFactor = 0.92;
+    
+    // Check for active keyboard input
+    const hasForward = keysPressed.has('w') || keysPressed.has('arrowup');
+    const hasVertical = keysPressed.has('s') || keysPressed.has('arrowdown');
+    const hasLeftRight = keysPressed.has('a') || keysPressed.has('arrowleft') || 
+                         keysPressed.has('d') || keysPressed.has('arrowright');
+    
+    if (keysPressed.has('w') || keysPressed.has('arrowup')) {
+      keyboardRotationSpeed.current += forwardSpeed * 0.25;
+      keyboardVerticalSpeed.current += verticalSpeed * 0.3;
+    }
+    
+    if (keysPressed.has('s') || keysPressed.has('arrowdown')) {
+      keyboardVerticalSpeed.current -= verticalSpeed * 0.3;
+      keyboardRotationSpeed.current += forwardSpeed * 0.15;
+    }
+    
+    if (keysPressed.has('a') || keysPressed.has('arrowleft')) {
+      keyboardCameraDepthSpeed.current += cameraDepthSpeed * 0.3;
+      keyboardRotationSpeed.current += forwardSpeed * 0.15;
+    }
+    if (keysPressed.has('d') || keysPressed.has('arrowright')) {
+      keyboardCameraDepthSpeed.current -= cameraDepthSpeed * 0.3;
+      keyboardRotationSpeed.current += forwardSpeed * 0.15;
+    }
+    
+    // Apply momentum damping when keys are not pressed
+    if (!hasForward) {
+      keyboardRotationSpeed.current *= keyboardDampingFactor;
+      if (Math.abs(keyboardRotationSpeed.current) < 0.0003) {
+        keyboardRotationSpeed.current = 0;
+      }
+    }
+    
+    if (!hasVertical) {
+      keyboardVerticalSpeed.current *= keyboardDampingFactor;
+      if (Math.abs(keyboardVerticalSpeed.current) < 0.0003) {
+        keyboardVerticalSpeed.current = 0;
+      }
+    }
+    
+    if (!hasLeftRight) {
+      keyboardCameraDepthSpeed.current *= keyboardDampingFactor;
+      if (Math.abs(keyboardCameraDepthSpeed.current) < 0.0003) {
+        keyboardCameraDepthSpeed.current = 0;
+      }
+    }
+    
+    // Cap maximum speeds to prevent runaway acceleration - REDUCED
+    const maxRotationSpeed = forwardSpeed * 1.5;
+    const maxVerticalSpeed = verticalSpeed * 1.5;
+    const maxCameraDepthSpeed = cameraDepthSpeed * 1.5;
+    keyboardRotationSpeed.current = Math.max(-maxRotationSpeed, Math.min(maxRotationSpeed, keyboardRotationSpeed.current));
+    keyboardVerticalSpeed.current = Math.max(-maxVerticalSpeed, Math.min(maxVerticalSpeed, keyboardVerticalSpeed.current));
+    keyboardCameraDepthSpeed.current = Math.max(-maxCameraDepthSpeed, Math.min(maxCameraDepthSpeed, keyboardCameraDepthSpeed.current));
+    
+    // Apply keyboard rotation to island with momentum
+    if (Math.abs(keyboardRotationSpeed.current) > 0.0003) {
+      islandRef.current.rotation.y += keyboardRotationSpeed.current;
+      setRotationSpeed(keyboardRotationSpeed.current);
+    }
+    
+    // Apply vertical movement to plane
+    if (Math.abs(keyboardVerticalSpeed.current) > 0.0003) {
+      const newVerticalOffset = planeVerticalOffset.current + keyboardVerticalSpeed.current;
+      planeVerticalOffset.current = Math.max(-maxVerticalOffset, Math.min(maxVerticalOffset, newVerticalOffset));
+      if (setPlaneVerticalOffset) {
+        setPlaneVerticalOffset(planeVerticalOffset.current);
+      }
+    }
+    
+    // Apply camera depth changes with momentum and limits
+    if (Math.abs(keyboardCameraDepthSpeed.current) > 0.0003) {
+      const newDepth = planeCameraDepth.current + keyboardCameraDepthSpeed.current;
+      planeCameraDepth.current = Math.max(-maxCameraDepth, Math.min(maxCameraDepth, newDepth));
+      if (setPlaneCameraDepth) {
+        setPlaneCameraDepth(planeCameraDepth.current);
+      }
+    }
+    
+    // Handle mouse/touch rotation damping and keyboard momentum integration
+    const hasAnyInput = hasForward || hasVertical || hasLeftRight;
+    
+    if (!isRotating || !hasAnyInput) {
+      //Apply damping factor to mouse rotation, make plane roll smoother
       rotationSpeed.current *= dampingFactor;
+      
+      // Apply gentle damping to vertical offset - returns slowly to default when no input
+      if (!hasVertical && Math.abs(keyboardVerticalSpeed.current) < 0.001) {
+        const targetVertical = 0; // Default vertical position
+        const verticalDampingFactor = 0.992; // Slightly faster return than orbit
+        planeVerticalOffset.current = planeVerticalOffset.current * verticalDampingFactor + targetVertical * (1 - verticalDampingFactor);
+        
+        if (Math.abs(planeVerticalOffset.current - targetVertical) < 0.001) {
+          planeVerticalOffset.current = targetVertical;
+        }
+        
+        if (setPlaneVerticalOffset) {
+          setPlaneVerticalOffset(planeVerticalOffset.current);
+        }
+      }
+      
+      // Apply gentle damping to camera depth - returns slowly to default when no input
+      if (!hasLeftRight && Math.abs(keyboardCameraDepthSpeed.current) < 0.001) {
+        const targetDepth = 0; // Default camera depth position
+        const depthDampingFactor = 0.993; // Return to center
+        planeCameraDepth.current = planeCameraDepth.current * depthDampingFactor + targetDepth * (1 - depthDampingFactor);
+        
+        if (Math.abs(planeCameraDepth.current - targetDepth) < 0.001) {
+          planeCameraDepth.current = targetDepth;
+        }
+        
+        if (setPlaneCameraDepth) {
+          setPlaneCameraDepth(planeCameraDepth.current);
+        }
+      }
 
       if (Math.abs(rotationSpeed.current) < 0.001) {
         rotationSpeed.current = 0;
       }
 
-      islandRef.current.rotation.y += rotationSpeed.current;
-      setRotationSpeed(rotationSpeed.current);
-    } else {
-      //if it is rotating we must normalize the rotation value to ensure its in the interval [0, 2PI]
-      const rotation = islandRef.current.rotation.y;
-
-      // Set the current stage based on the island's orientation
-      const normalizedRotation =
-        ((rotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-
-      if (normalizedRotation >= 0 && normalizedRotation < Math.PI / 2) {
-        setCurrentStage(2);
-      } else if (
-        normalizedRotation >= Math.PI / 2 &&
-        normalizedRotation < Math.PI
-      ) {
-        setCurrentStage(3);
-      } else if (
-        normalizedRotation >= Math.PI &&
-        normalizedRotation < (3 * Math.PI) / 2
-      ) {
-        setCurrentStage(4);
-      } else if (
-        normalizedRotation >= (3 * Math.PI) / 2 &&
-        normalizedRotation <= 2 * Math.PI
-      ) {
-        setCurrentStage(1);
-      } else {
-        setCurrentStage(null);
+      // Apply any remaining momentum from mouse drag
+      if (Math.abs(rotationSpeed.current) > 0.001) {
+        islandRef.current.rotation.y += rotationSpeed.current;
+        setRotationSpeed(rotationSpeed.current);
       }
+    }
+    
+    const rotation = islandRef.current.rotation.y;
+    const normalizedRotation = ((rotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+
+    if (normalizedRotation >= 0 && normalizedRotation < Math.PI / 2) {
+      setCurrentStage(2);
+    } else if (
+      normalizedRotation >= Math.PI / 2 &&
+      normalizedRotation < Math.PI
+    ) {
+      setCurrentStage(3);
+    } else if (
+      normalizedRotation >= Math.PI &&
+      normalizedRotation < (3 * Math.PI) / 2
+    ) {
+      setCurrentStage(4);
+    } else if (
+      normalizedRotation >= (3 * Math.PI) / 2 &&
+      normalizedRotation <= 2 * Math.PI
+    ) {
+      setCurrentStage(1);
+    } else {
+      setCurrentStage(null);
     }
   });
 
