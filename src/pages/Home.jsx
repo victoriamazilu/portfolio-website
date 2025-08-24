@@ -2,6 +2,7 @@ import { Suspense, useState, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
 import Loader from "../components/Loader";
 import HomeInfo from "../components/HomeInfo";
+import ContactModal from "../components/ContactModal";
 import Island from "../models/Island";
 import Sky from "../models/Sky";
 import Bird from "../models/Bird";
@@ -17,6 +18,7 @@ const Home = () => {
   const [planeOrbitRadius, setPlaneOrbitRadius] = useState(1.0);
   const [planeVerticalOffset, setPlaneVerticalOffset] = useState(0);
   const [planeCameraDepth, setPlaneCameraDepth] = useState(0);
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
   const adjustIsland = () => {
     let screenPos, screenScale;
@@ -65,10 +67,14 @@ const Home = () => {
     }
   };
 
+  const handleContactClick = () => {
+    setIsContactModalOpen(true);
+  };
+
   return (
     <section className="w-full h-screen relative">
       <div className="absolute top-20 left-0 right-0 z-10 flex items-center justify-center">
-        {currentStage && <HomeInfo currentStage={currentStage} />}
+        {currentStage && <HomeInfo currentStage={currentStage} onContactClick={handleContactClick} />}
       </div>
 
       {/* Gesture Hint Footer */}
@@ -130,6 +136,11 @@ const Home = () => {
           />
         </Suspense>
       </Canvas>
+      
+      <ContactModal 
+        isOpen={isContactModalOpen} 
+        onClose={() => setIsContactModalOpen(false)} 
+      />
     </section>
   );
 };

@@ -48,8 +48,18 @@ const renderContent = {
   ),
 };
 
-const HomeInfo = ({ currentStage }) => {
-  return renderContent[currentStage] || null;
+const HomeInfo = ({ currentStage, onContactClick }) => {
+  return renderContent[currentStage] ? (
+    currentStage === 4 ? (
+      <div className="text-xl lg:text-2xl sm:leading-snug text-center neo-brutalism-blue py-4 px-8 lg:py-6 text-white mx-10 my-10">
+        <p className="text-sm lg:text-xl text-center">Looking for Software Engineer? I'm just a few keystrokes away...</p>
+        <button onClick={onContactClick} className="text-sm lg:text-lg neo-brutalism-white neo-btn">
+          Let's talk!
+          <img src={arrow} className="w-4 h-4 object-contain" />
+        </button>
+      </div>
+    ) : renderContent[currentStage]
+  ) : null;
 };
 
 export default HomeInfo;
