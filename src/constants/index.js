@@ -14,6 +14,7 @@ import {
   html,
   javascript,
   linkedin,
+  x,
   react,
   tailwindcss,
   python,
@@ -178,6 +179,11 @@ export const socialLinks = [
     name: "LinkedIn",
     iconUrl: linkedin,
     link: "https://www.linkedin.com/in/victoriamazilu/",
+  },
+  {
+    name: "X",
+    iconUrl: x,
+    link: "https://x.com/victoriamazilu",
   },
 ];
 

@@ -25,7 +25,7 @@ const Experience = () => {
       </div>
       <div className="mt-5 flex flex-col cap-3 text-slate-500">
         <p>
-          Software Engineer from Toronto currently in my first year at the
+          Software Engineer from Toronto currently in my third year at the
           University of Waterloo! My enthusiasm for learning and innovating
           fuels my love for tackling challenging problems with determination and
           enthusiasm.
@@ -45,34 +45,13 @@ const Experience = () => {
             <img
               src={social.iconUrl}
               alt={social.name}
-              className="w-8 h-8 object-contain" // Adjust size as needed
+              className="w-8 h-8 object-contain"
             />
           </a>
         ))}
       </div>
 
-      {/* Skill boxes */}
-      <div className="py-10 flex flex-col">
-        <h3 className="subhead-text">My Skills</h3>
-        <div className="mt-16 flex flex-wrap gap-12">
-          {skills.map((skill) => (
-            <div className="block-container w-20 h-20" key={skill.name}>
-              <div className="btn-back rounded-xl shadow-lg" />
-              <div className="btn-front rounded-xl flex justify-center items-center">
-                <img
-                  src={skill.imageUrl}
-                  alt={skill.name}
-                  className="w-1/2 h-1/2 object-contain"
-                />
-              </div>
-              <p className="text-sm text-center mt-20 text-slate-500">
-                {skill.name}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        <div className="py-20">
+      <div className="py-20">
           <h3 className="subhead-text">Work Experience</h3>
           <div className="mt-5 flex flex-col gap-3 text-slate-500">
             <p>
@@ -82,8 +61,8 @@ const Experience = () => {
           </div>
         </div>
 
-        {/* Imported React timeline component with styling */}
-        <div className="flex">
+      {/* Imported React timeline component with styling */}
+      <div className="flex">
           <VerticalTimeline>
             {experiences.map((experience) => (
               <VerticalTimelineElement
@@ -133,6 +112,28 @@ const Experience = () => {
               </VerticalTimelineElement>
             ))}
           </VerticalTimeline>
+        </div>
+
+        
+      {/* Skill boxes */}
+      <div className="py-10 flex flex-col">
+        <h3 className="subhead-text">My Skills</h3>
+        <div className="mt-16 flex flex-wrap gap-12">
+          {skills.map((skill) => (
+            <div className="block-container w-20 h-20" key={skill.name}>
+              <div className="btn-back rounded-xl shadow-lg" />
+              <div className="btn-front rounded-xl flex justify-center items-center">
+                <img
+                  src={skill.imageUrl}
+                  alt={skill.name}
+                  className="w-1/2 h-1/2 object-contain"
+                />
+              </div>
+              <p className="text-sm text-center mt-20 text-slate-500">
+                {skill.name}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
 

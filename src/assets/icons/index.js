@@ -6,6 +6,7 @@ import javascript from "./javascript.svg";
 import react from "./react.svg";
 import tailwindcss from "./tailwindcss.svg";
 import linkedin from "./linkedin.svg";
+import x from "./x.svg";
 import arrow from "./arrow.svg";
 import contact from "./contact.svg";
 import python from "./python.svg";
@@ -32,6 +33,7 @@ export {
     react,
     tailwindcss,
     linkedin,
+    x,
     arrow,
     contact,
     python,
