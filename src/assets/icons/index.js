@@ -21,6 +21,7 @@ import nextjs from "./nextjs.svg";
 import mongodb from "./mongodb.svg";
 import typescript from "./typescript.svg";
 import swarm from "./swarm.png";
+import pathfindr from "./pathfindr.png";
 
 export {
     css,
@@ -46,4 +47,5 @@ export {
     mongodb,
     typescript,
     swarm,
+    pathfindr,
 };

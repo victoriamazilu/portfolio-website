@@ -28,6 +28,7 @@ import {
   mongodb,
   typescript,
   swarm,
+  pathfindr,
 } from "../assets/icons";
 import icon from "../assets/icon.png";
 
@@ -181,6 +182,15 @@ export const socialLinks = [
 ];
 
 export const projects = [
+  {
+    iconUrl: pathfindr,
+    theme: "btn-back-black",
+    name: "Pathfindr",
+    description:
+      "Pathfindr is a rock climbing route management and session tracking application built for rock climbing enthusiasts (currently only supports Waterloo PAC Climbing Gym). The platform enables climbers to discover routes, track their climbing sessions, analyze their progress, and get personalized recommendations. Features include route filtering and exploration, session management with route completion tracking, progress analytics, and a recommendation system based on climbing history and preferences.",
+    link: "https://github.com/victoriamazilu/pathfindr",
+    liveLink: "https://pathfindr.vmazilu.ca",
+  },
   {
     iconUrl: swarm,
     theme: "btn-back-yellow",

@@ -47,9 +47,9 @@ const Projects = () => {
                 <img src={arrow} alt="arrow" className="w-4 h-4 object-contain"/>
                 </div>
               }
-              {project.name === "Swarm" && 
+              {project.liveLink && 
                 <div className="mt-2 flex items-center gap-2 font-poppins">
-                  <Link to="https://swarm.vmazilu.ca" target="_blank" rel="noopener noreferrer" className="font-semibold text-blue-600">
+                  <Link to={project.liveLink} target="_blank" rel="noopener noreferrer" className="font-semibold text-blue-600">
                     Live Link
                   </Link>
                   <img src={arrow} alt="arrow" className="w-4 h-4 object-contain"/>
