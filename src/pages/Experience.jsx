@@ -26,9 +26,7 @@ const Experience = () => {
       <div className="mt-5 flex flex-col cap-3 text-slate-500">
         <p>
           Software Engineer from Toronto currently in my third year at the
-          University of Waterloo! My enthusiasm for learning and innovating
-          fuels my love for tackling challenging problems with determination and
-          enthusiasm.
+          University of Waterloo!
         </p>
       </div>
 
@@ -89,12 +87,33 @@ const Experience = () => {
                   <h3 className="text-black text-xl font-poppins font-semibold">
                     {experience.title}
                   </h3>
-                  <p
-                    className="text-black-500 font-medium font-base"
-                    style={{ margin: 0 }}
-                  >
-                    {experience.company_name}
-                  </p>
+                  {experience.team && (
+                    <p className="text-gray-600 font-medium text-sm italic" style={{ margin: 0 }}>
+                      {experience.team}
+                    </p>
+                  )}
+                  {experience.link ? (
+                    <a
+                      href={experience.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-black-500 hover:text-black font-medium font-base transition-colors inline-flex items-center gap-1"
+                      style={{ margin: 0 }}
+                    >
+                      {experience.company_name}
+                      <svg className="w-4 h-4 opacity-60" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
+                        <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
+                      </svg>
+                    </a>
+                  ) : (
+                    <p
+                      className="text-black-500 font-medium font-base"
+                      style={{ margin: 0 }}
+                    >
+                      {experience.company_name}
+                    </p>
+                  )}
                 </div>
                 <div className="my-5 list-disc ml-5 space-y-2">
                   {/* {experience.company_name === "FYI101" && <h4 className="text-black-500/50 font-normal pl-1 text-medium">Objectives:</h4>} */}
