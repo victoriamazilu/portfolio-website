@@ -1,15 +1,18 @@
 import { Suspense, useState, useEffect } from "react";
 import { Canvas } from "@react-three/fiber";
+import * as THREE from "three";
 import Loader from "../components/Loader";
 import HomeInfo from "../components/HomeInfo";
 import ContactModal from "../components/ContactModal";
 import Island from "../models/Island";
+import Island2 from "../models/Island2";
 import Sky from "../models/Sky";
 import Bird from "../models/Bird";
 import Plane from "../models/Plane";
 import GestureHint from "../models/GestureHint";
 
 const Home = () => {
+  const [useIsland2, setUseIsland2] = useState(true);
   const [isRotating, setIsRotating] = useState(false);
   const [currentStage, setCurrentStage] = useState(1);
   const [rotationSpeed, setRotationSpeed] = useState(0);
@@ -50,6 +53,7 @@ const Home = () => {
   };
 
   const [islandScale, islandPos, islandRot] = adjustIsland();
+  const island2Pos = [islandPos[0], islandPos[1] + 25, islandPos[2]];
   const [planeScale, planePos] = adjustPlane();
 
   useEffect(() => {
@@ -59,6 +63,28 @@ const Home = () => {
       setShowGestureHint(false);
     }
   }, [hasInteracted]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key.toLowerCase() === "i" && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        const tag = e.target?.tagName;
+        if (tag === "INPUT" || tag === "TEXTAREA") return;
+        e.preventDefault();
+        setUseIsland2((prev) => !prev);
+        setPlaneVerticalOffset(0);
+        setPlaneCameraDepth(0);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  const switchIsland = (next) => {
+    setUseIsland2(next);
+    setPlaneVerticalOffset(0);
+    setPlaneCameraDepth(0);
+  };
 
   const handleFirstInteraction = () => {
     if (!hasInteracted) {
@@ -77,6 +103,37 @@ const Home = () => {
         {currentStage && <HomeInfo currentStage={currentStage} onContactClick={handleContactClick} />}
       </div>
 
+      {/* Island toggle */}
+      <div className="absolute bottom-6 left-6 z-10 flex flex-col gap-1.5">
+        <div className="flex rounded-lg overflow-hidden shadow-md border border-white/60">
+          <button
+            type="button"
+            onClick={() => switchIsland(false)}
+            className={`px-3 py-1.5 text-xs font-semibold transition-colors ${
+              !useIsland2
+                ? "bg-[#2b77e7] text-white"
+                : "bg-white/90 text-slate-600 hover:bg-white"
+            }`}
+          >
+            Original
+          </button>
+          <button
+            type="button"
+            onClick={() => switchIsland(true)}
+            className={`px-3 py-1.5 text-xs font-semibold transition-colors ${
+              useIsland2
+                ? "bg-[#2b77e7] text-white"
+                : "bg-white/90 text-slate-600 hover:bg-white"
+            }`}
+          >
+            Island 2
+          </button>
+        </div>
+        <span className="text-[10px] text-slate-500 bg-white/70 px-2 py-0.5 rounded self-start">
+          Press I to toggle
+        </span>
+      </div>
+
       {/* Gesture Hint Footer */}
       {showGestureHint && (
         <div className="absolute bottom-20 left-0 right-0 z-10 flex items-center justify-center">
@@ -93,31 +150,77 @@ const Home = () => {
           isRotating ? "cursor-grabbing" : "cursor-grab"
         }`}
         camera={{ near: 0.1, far: 1000 }}
+        shadows={useIsland2}
+        gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}
+        onCreated={({ gl }) => {
+          gl.toneMappingExposure = useIsland2 ? 1.5 : 1;
+        }}
       >
         <Suspense fallback={<Loader />}>
-          <directionalLight position={[1, 1, 1]} intensity={2} />
-          <ambientLight intensity={2} />
-          <hemisphereLight
-            skyColor="#b1e1ff"
-            groundColor="#000000"
-            intensity={1}
-          />
+          {useIsland2 ? (
+            <>
+              <directionalLight
+                castShadow
+                position={[40, 60, 30]}
+                intensity={3.2}
+                shadow-mapSize={[1024, 1024]}
+                shadow-camera-near={0.5}
+                shadow-camera-far={500}
+                shadow-camera-left={-80}
+                shadow-camera-right={80}
+                shadow-camera-top={80}
+                shadow-camera-bottom={-80}
+              />
+              <directionalLight position={[-30, 30, -20]} intensity={1.2} />
+              <ambientLight intensity={1.35} />
+              <hemisphereLight
+                skyColor="#d4ecff"
+                groundColor="#8fb88f"
+                intensity={1.25}
+              />
+            </>
+          ) : (
+            <>
+              <directionalLight position={[1, 1, 1]} intensity={2} />
+              <ambientLight intensity={2} />
+              <hemisphereLight
+                skyColor="#b1e1ff"
+                groundColor="#000000"
+                intensity={1}
+              />
+            </>
+          )}
 
           <Bird />
           <Sky isRotating={isRotating} currentRotationSpeed={rotationSpeed} />
-          <Island
-            scale={islandScale}
-            position={islandPos}
-            rotation={islandRot}
-            isRotating={isRotating}
-            setIsRotating={setIsRotating}
-            setCurrentStage={setCurrentStage}
-            setRotationSpeed={setRotationSpeed}
-            onFirstInteraction={handleFirstInteraction}
-            setPlaneOrbitRadius={setPlaneOrbitRadius}
-            setPlaneVerticalOffset={setPlaneVerticalOffset}
-            setPlaneCameraDepth={setPlaneCameraDepth}
-          />
+          {!useIsland2 && (
+            <Island
+              scale={islandScale}
+              position={islandPos}
+              rotation={islandRot}
+              isRotating={isRotating}
+              setIsRotating={setIsRotating}
+              setCurrentStage={setCurrentStage}
+              setRotationSpeed={setRotationSpeed}
+              onFirstInteraction={handleFirstInteraction}
+              setPlaneVerticalOffset={setPlaneVerticalOffset}
+              setPlaneCameraDepth={setPlaneCameraDepth}
+            />
+          )}
+          {useIsland2 && (
+            <Island2
+              scale={islandScale.map((s) => s * 3)}
+              position={island2Pos}
+              rotation={islandRot}
+              isRotating={isRotating}
+              setIsRotating={setIsRotating}
+              setCurrentStage={setCurrentStage}
+              setRotationSpeed={setRotationSpeed}
+              onFirstInteraction={handleFirstInteraction}
+              setPlaneVerticalOffset={setPlaneVerticalOffset}
+              setPlaneCameraDepth={setPlaneCameraDepth}
+            />
+          )}
           <Plane
             scale={planeScale}
             position={planePos}
