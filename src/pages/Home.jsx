@@ -153,17 +153,20 @@ const Home = () => {
         shadows={useIsland2}
         gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}
         onCreated={({ gl }) => {
-          gl.toneMappingExposure = useIsland2 ? 1.5 : 1;
+          gl.toneMappingExposure = useIsland2 ? 1.35 : 1;
         }}
       >
         <Suspense fallback={<Loader />}>
           {useIsland2 ? (
             <>
+              {/* Key — strong, creates depth + shadows */}
               <directionalLight
                 castShadow
-                position={[40, 60, 30]}
-                intensity={3.2}
+                position={[45, 70, 35]}
+                intensity={3.8}
+                color="#fff8f0"
                 shadow-mapSize={[1024, 1024]}
+                shadow-bias={-0.0003}
                 shadow-camera-near={0.5}
                 shadow-camera-far={500}
                 shadow-camera-left={-80}
@@ -171,12 +174,19 @@ const Home = () => {
                 shadow-camera-top={80}
                 shadow-camera-bottom={-80}
               />
-              <directionalLight position={[-30, 30, -20]} intensity={1.2} />
-              <ambientLight intensity={1.35} />
+              {/* Cool fill — colour without flattening */}
+              <directionalLight position={[-40, 25, 20]} intensity={0.9} color="#7eb8ff" />
+              {/* Warm accent */}
+              <directionalLight position={[20, 15, 40]} intensity={0.5} color="#ffb88a" />
+              {/* Back lights — readable when spinning, without flattening */}
+              <directionalLight position={[0, 28, -50]} intensity={1.6} color="#9ec8ff" />
+              <directionalLight position={[-35, 22, -45]} intensity={0.85} color="#a8d4ff" />
+              <directionalLight position={[35, 18, -40]} intensity={0.7} color="#c8b8ff" />
+              <ambientLight intensity={0.55} />
               <hemisphereLight
-                skyColor="#d4ecff"
-                groundColor="#8fb88f"
-                intensity={1.25}
+                skyColor="#b1e1ff"
+                groundColor="#4a6741"
+                intensity={0.85}
               />
             </>
           ) : (

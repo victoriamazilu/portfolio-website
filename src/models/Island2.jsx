@@ -18,23 +18,31 @@ const enhanceMaterials = (object) => {
     const materials = Array.isArray(source) ? source : [source];
 
     const upgraded = materials.map((mat) => {
+      const baseColor = mat.color
+        ? mat.color.clone()
+        : new THREE.Color("#ffffff");
+
+      baseColor.multiplyScalar(1.32);
+
+      const hsl = { h: 0, s: 0, l: 0 };
+      baseColor.getHSL(hsl);
+      baseColor.setHSL(hsl.h, Math.min(hsl.s * 1.12, 1), hsl.l);
+
       if (mat.isMeshLambertMaterial) {
+        mat.color.copy(baseColor);
+        mat.emissive.set("#000000");
         mat.needsUpdate = true;
         return mat;
       }
 
       return new THREE.MeshLambertMaterial({
         map: mat.map ?? null,
-        color: mat.color
-          ? mat.color.clone().multiplyScalar(1.2)
-          : new THREE.Color("#ffffff"),
+        color: baseColor,
         transparent: mat.transparent ?? false,
         opacity: mat.opacity ?? 1,
         alphaMap: mat.alphaMap ?? null,
         side: mat.side ?? THREE.FrontSide,
-        emissive: mat.emissive
-          ? mat.emissive.clone().multiplyScalar(0.2)
-          : new THREE.Color("#445566"),
+        emissive: new THREE.Color("#000000"),
       });
     });
 
