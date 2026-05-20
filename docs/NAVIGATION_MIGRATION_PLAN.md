@@ -33,7 +33,7 @@
 | Today | After migration |
 |-------|-----------------|
 | React Router pages (`/`, `/experience`, `/projects`) | Single canvas page; content as overlays |
-| Drag to rotate island → stage 1–4 text boxes | Fly plane to 3D zones → open overlays |
+| Drag to rotate island → stage 1–4 text boxes | Fly plane through archipelago sky-space → open overlays at landmarks |
 | Decorative plane orbiting island | Rapier-controlled flyable character (plane model) |
 | No spatial map / no progress | Coin/waypoint trail + collection progress in navbar |
 | Navbar links navigate away from 3D scene | Navbar triggers auto-flight or instant overlay (if visited) |
@@ -44,7 +44,7 @@
 - Vite + React (no Next.js migration required)
 - Tailwind + neo-brutalism styling
 - `constants/index.js` (experiences, projects, skills, social links)
-- Existing GLB assets where reusable (`plane.glb`, `sky.glb`, `birds.glb`)
+- Existing GLB assets where reusable (`island2.glb` as static hub, `plane.glb`, `sky.glb`, `birds.glb`)
 - Experience timeline, projects list, contact info content
 
 ### Estimated total effort
@@ -88,7 +88,7 @@ App (single view, no route-based page swaps)
 └── Canvas (full screen, always mounted)
     └── Experience (orchestrator)
         ├── Physics (Rapier)
-        ├── World (sky, island hub, landmarks)
+        ├── World (sky, island2 hub, 3 landmarks)
         ├── CharacterController (plane + camera rig)
         ├── Waypoints (collectible markers along path)
         ├── ZoneTriggers (experience, projects, contact)
@@ -118,11 +118,12 @@ These must be decided in **Phase 0** before writing flight/waypoint code.
 
 ### 3.1 World layout option (pick one)
 
-**Option A — Island archipelago (recommended)**  
+**Option A — Island archipelago ✅ CHOSEN**  
 Keep the floating island as the visual centerpiece. Build an explorable sky-space with 3 floating "landmarks" (experience dock, projects platform, contact tower) connected by a visible waypoint trail. Island becomes static scenery at spawn, not the navigation mechanism.
 
 - Pros: Reuses existing assets, unique to your site, smaller 3D authoring scope
 - Cons: Need to design landmark positions manually
+- **Hub asset:** `island2.glb` (already in scene via `Island2.jsx`) — larger scale, enhanced lighting/shadows; replaces original `island.glb` as the archipelago hub
 
 **Option B — Full terrain map (Rafael parity)**  
 Commission or build a large terrain GLB with collision mesh, spiral path upward.
@@ -130,7 +131,7 @@ Commission or build a large terrain GLB with collision mesh, spiral path upward.
 - Pros: Closest to Rafael's feel
 - Cons: Highest effort; likely 1–2 weeks of 3D authoring alone
 
-**Decision:** _[ ] Option A  [ ] Option B_
+**Decision:** _[x] Option A  [ ] Option B_ — locked **2026-05-20**
 
 ### 3.2 Waypoint visual
 
@@ -157,7 +158,7 @@ Use existing **`plane.glb`** as the flyable character (Rafael uses a plane-like 
 
 ### 3.5 Island rotation
 
-**Remove entirely.** Island is static world geometry. All navigation via character position + zone triggers.
+**Remove entirely.** `island2.glb` hub is static world geometry (no drag/WASD rotation). All navigation via character position + zone triggers. Temporary island toggle in `Home.jsx` is dev-only and deleted in Phase 8.
 
 ---
 
@@ -199,7 +200,8 @@ src/
 ├── pages/
 │   └── Home.jsx                     # Canvas + KeyboardControls + layout
 └── models/                          # DEPRECATED after migration
-    ├── Island.jsx                   # → scene/World.jsx (static mesh)
+    ├── Island.jsx                   # REMOVE (superseded by Island2)
+    ├── Island2.jsx                  # → scene/World.jsx (static island2 hub)
     ├── Plane.jsx                    # → scene/Character.jsx
     ├── Sky.jsx                      # → scene/World.jsx
     ├── Bird.jsx                     # Keep as ambient decoration
@@ -207,7 +209,7 @@ src/
 ```
 
 **Files to delete after migration:**  
-`HomeInfo.jsx`, `BackButton.jsx`, `pages/Experience.jsx`, `pages/Projects.jsx` (content moved to overlays), island rotation logic in `Island.jsx`.
+`HomeInfo.jsx`, `BackButton.jsx`, `pages/Experience.jsx`, `pages/Projects.jsx` (content moved to overlays), island rotation logic in `Island.jsx` / `Island2.jsx`, island toggle UI in `Home.jsx`.
 
 ---
 
@@ -263,9 +265,9 @@ Phases 5 and 2–3 can partially overlap once Phase 1 is done.
 #### Tasks
 
 - [ ] Play through [rafaelsf.com](https://www.rafaelsf.com/) and note: navbar flow, auto-flight, skip, manual toggle, zone entry, overlay close behavior
-- [ ] Decide world layout (Section 3.1): archipelago vs full map
-- [ ] Sketch waypoint path on paper — spawn → experience → projects → contact
-- [ ] Open island/plane GLBs in Blender or https://gltf-viewer.donmccurdy.com/ — note scale and origin
+- [x] Decide world layout (Section 3.1): **Option A — island archipelago**
+- [ ] Sketch waypoint path on paper — spawn at hub island → experience dock → projects platform → contact tower
+- [ ] Open `island2.glb`, `plane.glb` in Blender or https://gltf-viewer.donmccurdy.com/ — note scale and origin (hub island currently ~3× original scale in scene)
 - [ ] Define spawn point and 3 zone center coordinates (rough `[x, y, z]`)
 - [ ] Confirm Contact is a third navbar item (Rafael has Experience / Projects / Contact)
 - [ ] Stash or commit current WIP changes on branch before Phase 1 refactor
@@ -379,8 +381,8 @@ Phases 5 and 2–3 can partially overlap once Phase 1 is done.
 
 - [ ] Create `scene/World.jsx`:
   - Sky/environment (reuse `Sky.jsx` logic or drei `Environment`)
-  - Static island at hub position (no rotation interaction)
-  - Optional landmark meshes (boxes/GLBs) at zone positions for visual affordance
+  - Static **`island2.glb` hub** at spawn (port material/lighting from `Island2.jsx`; no rotation interaction)
+  - 3 landmark meshes at zone positions: experience dock, projects platform, contact tower (boxes/GLBs — author in Phase 0 sketch)
   - Lighting: directional + ambient + hemisphere (match current aesthetic)
 - [ ] Add Rapier static colliders:
   - Invisible boundary box so player cannot fly infinitely away
@@ -570,9 +572,9 @@ Phases 5 and 2–3 can partially overlap once Phase 1 is done.
 
 ## 8. 3D World & Waypoint Spec
 
-### Proposed archipelago layout (Option A)
+### Approved archipelago layout (Option A)
 
-Coordinate system: Y-up, character spawn at origin area.
+Coordinate system: Y-up. Character spawns near the **island2 hub**; three satellite landmarks radiate outward through sky-space. The hub is static scenery — navigation is character flight + waypoint collection, not island rotation.
 
 ```
                     [Contact Tower]
@@ -581,12 +583,21 @@ Coordinate system: Y-up, character spawn at origin area.
               [Projects Platform]
               waypoint 5-7
                     /
-         [Island Hub — spawn]
+         [Island2 Hub — spawn]
          waypoint 0-2
               \
          [Experience Dock]
          waypoint 3-4
 ```
+
+**Landmarks (to author in Phase 3):**
+
+| Landmark | Zone | Visual direction from hub |
+|----------|------|---------------------------|
+| Island2 hub | Spawn | Center — existing `island2.glb` |
+| Experience dock | Experience overlay | Lower-left / southwest |
+| Projects platform | Projects overlay | Upper-right / northeast |
+| Contact tower | Contact overlay | Upper-center / north |
 
 ### Starter coordinates (placeholder — tune in Phase 0)
 
@@ -809,10 +820,10 @@ const keyboardMap = [
 ## Appendix B — Phase 0 Action Items for Victoria
 
 1. Play rafaelsf.com end-to-end (10 min)
-2. Choose archipelago vs full map
-3. Sketch waypoint path around your island aesthetic
+2. ~~Choose archipelago vs full map~~ **Done — Option A (island archipelago)**
+3. Sketch waypoint path: island2 hub → experience dock → projects platform → contact tower
 4. Confirm Contact as third navbar destination
-5. Approve removing island drag-to-rotate permanently
+5. Approve removing island drag-to-rotate permanently (hub stays as static `island2.glb`)
 
 ---
 
@@ -824,8 +835,9 @@ const keyboardMap = [
 | `GestureHint.jsx` | `scene/CharacterController.jsx` |
 | `pages/Experience.jsx` | `scene/Character.jsx` |
 | `pages/Projects.jsx` | `scene/World.jsx` |
-| Island rotation logic | `scene/Waypoints.jsx` |
+| `Island.jsx`, `Island2.jsx` rotation logic | `scene/Waypoints.jsx` |
 | Decorative `Plane.jsx` orbit | `scene/triggers/*` |
+| Island toggle UI in `Home.jsx` | (removed in Phase 8) |
 | `BackButton.jsx` | `components/overlays/*` |
 | | `contexts/WaypointContext.jsx` |
 | | `constants/navigation.js` |
@@ -834,4 +846,4 @@ const keyboardMap = [
 
 ---
 
-*Document version: 1.0 · Branch: `feature/raf-style-navigation` · Created for Victoria Mazilu portfolio migration.*
+*Document version: 1.1 · Branch: `feature/raf-style-navigation` · Option A (archipelago) locked 2026-05-20 · Hub asset: `island2.glb`.*
