@@ -32,9 +32,10 @@ const WorldLights = () => (
   </>
 );
 
-const FlightWorld = ({ flightSpeed, onFirstMove, onFlightChange }) => {
+const FlightWorld = ({ onFirstMove }) => {
   const bodyRef = useRef();
   const headingRef = useRef(0);
+  const motionRef = useRef({ speed: 0, yawRate: 0 });
   const original = ISLANDS.original;
   const island2 = ISLANDS.island2;
 
@@ -45,7 +46,7 @@ const FlightWorld = ({ flightSpeed, onFirstMove, onFlightChange }) => {
       <color attach="background" args={["#b1e1ff"]} />
 
       <WorldLights />
-      <Sky isRotating={flightSpeed > 0.5} currentRotationSpeed={flightSpeed * 0.02} />
+      <Sky motionRef={motionRef} />
       <Bird />
 
       <StaticIsland
@@ -63,8 +64,8 @@ const FlightWorld = ({ flightSpeed, onFirstMove, onFlightChange }) => {
         <PlaneController
           bodyRef={bodyRef}
           headingRef={headingRef}
+          motionRef={motionRef}
           onFirstMove={onFirstMove}
-          onFlightChange={onFlightChange}
         />
       </Physics>
 

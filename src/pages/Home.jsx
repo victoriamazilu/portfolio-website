@@ -1,4 +1,4 @@
-import { Suspense, useState, useEffect, useCallback } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { KeyboardControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import Loader from "../components/Loader";
@@ -8,7 +8,6 @@ import FlightWorld from "../scene/FlightWorld";
 import { keyboardMap } from "../constants/navigation";
 
 const Home = () => {
-  const [flightSpeed, setFlightSpeed] = useState(0);
   const [showGestureHint, setShowGestureHint] = useState(true);
   const [hasInteracted, setHasInteracted] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
@@ -31,10 +30,6 @@ const Home = () => {
       setShowGestureHint(false);
     }
   };
-
-  const handleFlightChange = useCallback((speed) => {
-    setFlightSpeed(speed);
-  }, []);
 
   return (
     <section className="w-full h-screen relative">
@@ -73,11 +68,7 @@ const Home = () => {
           }}
         >
           <Suspense fallback={<Loader />}>
-            <FlightWorld
-              flightSpeed={flightSpeed}
-              onFirstMove={handleFirstMove}
-              onFlightChange={handleFlightChange}
-            />
+            <FlightWorld onFirstMove={handleFirstMove} />
           </Suspense>
         </Canvas>
       </KeyboardControls>

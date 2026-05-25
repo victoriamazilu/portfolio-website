@@ -4,7 +4,7 @@ import { Vector3 } from "three";
 import { SPAWN_POSITION } from "../constants/navigation";
 
 const CAMERA_OFFSET = new Vector3(0, 10, -10);
-const LOOK_AHEAD_OFFSET = new Vector3(0, 2, 12);
+const LOOK_AHEAD_OFFSET = new Vector3(0, 7, 12);
 const UP_AXIS = new Vector3(0, 1, 0);
 
 const ChaseCamera = ({ bodyRef, getRotationY }) => {
