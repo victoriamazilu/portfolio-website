@@ -3,21 +3,25 @@ import { degToRad } from "three/src/math/MathUtils.js";
 
 export const FLIGHT_CONFIG = {
   maxSpeed: 17,
-  minSpeed: -4,
+  minSpeed: -6,
   acceleration: 9,
-  brakeForce: 11,
+  brakeForce: 14,
+  reverseAcceleration: 13,
   drag: 0.28,
-  maxRoll: degToRad(32),
-  rollResponse: 0.11,
+  maxRoll: degToRad(36),
+  rollResponse: 0.13,
   rollReturn: 0.07,
   /** Yaw rate scales with bank angle and forward speed */
-  turnRate: degToRad(44),
+  turnRate: degToRad(54),
   minTurnSpeed: 0.35,
-  maxPitch: degToRad(22),
+  /** Creep forward when turning from a standstill with A/D */
+  taxiSpeed: 5,
+  taxiAcceleration: 14,
+  maxPitch: degToRad(18),
   pitchResponse: 0.1,
   pitchReturn: 0.08,
-  climbRate: 9,
-  descendRate: 9,
+  climbRate: 6,
+  descendRate: 6,
   velocitySmoothing: 0.14,
   headingSmoothing: 0.1,
 };
@@ -48,12 +52,14 @@ export const stepFlightPhysics = (state, input, delta) => {
   if (throttle > 0) {
     state.speed += throttle * cfg.acceleration * dt;
   } else if (throttle < 0) {
-    const brake = state.speed > 0 ? cfg.brakeForce : cfg.acceleration;
+    const brake = state.speed > 0 ? cfg.brakeForce : cfg.reverseAcceleration;
     state.speed += throttle * brake * dt;
   }
 
+  const isTurning = input.leftward || input.rightward;
+
   state.speed *= 1 - cfg.drag * dt;
-  if (Math.abs(state.speed) < 0.05 && throttle === 0) {
+  if (Math.abs(state.speed) < 0.05 && throttle === 0 && !isTurning) {
     state.speed = 0;
   }
   state.speed = clamp(state.speed, cfg.minSpeed, cfg.maxSpeed);
@@ -62,18 +68,29 @@ export const stepFlightPhysics = (state, input, delta) => {
   else if (input.rightward) state.targetRoll = -cfg.maxRoll;
   else state.targetRoll = 0;
 
-  const isReversing = input.backward || state.speed < 0;
-  if (isReversing && state.targetRoll !== 0) {
-    state.targetRoll *= -1;
-  }
-
   const rollSmooth = state.targetRoll === 0 ? cfg.rollReturn : cfg.rollResponse;
   state.roll = MathUtils.lerp(state.roll, state.targetRoll, rollSmooth);
 
+  // From standstill, A/D creeps forward while banking (no W needed)
+  if (isTurning && !input.backward && throttle >= 0 && state.speed < cfg.taxiSpeed) {
+    state.speed = Math.min(
+      cfg.taxiSpeed,
+      state.speed + cfg.taxiAcceleration * dt
+    );
+  }
+
   const speedRatio = clamp(Math.abs(state.speed) / cfg.maxSpeed, 0, 1);
-  if (Math.abs(state.speed) > cfg.minTurnSpeed && Math.abs(state.roll) > 0.01) {
-    const turnDirection = Math.sign(state.speed);
-    state.heading += state.roll * cfg.turnRate * speedRatio * turnDirection * dt;
+  const turnSpeedRatio = Math.max(speedRatio, isTurning && !input.backward ? 0.25 : 0);
+
+  if (Math.abs(state.roll) > 0.01) {
+    const canTurn =
+      Math.abs(state.speed) > cfg.minTurnSpeed ||
+      (isTurning && !input.backward && state.speed > 0);
+
+    if (canTurn) {
+      const turnDirection = state.speed < 0 ? -1 : 1;
+      state.heading += state.roll * cfg.turnRate * turnSpeedRatio * turnDirection * dt;
+    }
   }
 
   if (input.up) state.targetPitch = -cfg.maxPitch;

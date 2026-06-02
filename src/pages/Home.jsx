@@ -5,7 +5,7 @@ import Loader from "../components/Loader";
 import ContactModal from "../components/ContactModal";
 import MovementInstructions from "../components/MovementInstructions";
 import FlightWorld from "../scene/FlightWorld";
-import { keyboardMap } from "../constants/navigation";
+import { keyboardMap, INITIAL_CAMERA_POSITION } from "../constants/navigation";
 
 const Home = () => {
   const [showGestureHint, setShowGestureHint] = useState(true);
@@ -47,7 +47,7 @@ const Home = () => {
       {showGestureHint && (
         <div className="absolute bottom-24 left-0 right-0 z-10 flex items-center justify-center pointer-events-none">
           <div className="text-sm text-center neo-brutalism-blue py-2 px-6 text-white mx-10 opacity-90 animate-pulse">
-            Press W to fly forward — islands are ahead of you
+            Press W to fly forward — follow the dotted ring around the island
           </div>
         </div>
       )}
@@ -60,7 +60,7 @@ const Home = () => {
             fov: 55,
             near: 0.1,
             far: 2000,
-            position: [0, 16, -72],
+            position: INITIAL_CAMERA_POSITION,
           }}
           gl={{ antialias: true }}
           onCreated={({ gl }) => {

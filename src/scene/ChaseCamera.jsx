@@ -1,11 +1,14 @@
 import { useEffect, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Vector3 } from "three";
-import { SPAWN_POSITION } from "../constants/navigation";
+import {
+  SPAWN_POSITION,
+  CAMERA_CHASE_OFFSET,
+} from "../constants/navigation";
 
-const CAMERA_OFFSET = new Vector3(0, 10, -10);
 const LOOK_AHEAD_OFFSET = new Vector3(0, 7, 12);
 const UP_AXIS = new Vector3(0, 1, 0);
+const CAMERA_OFFSET = new Vector3(...CAMERA_CHASE_OFFSET);
 
 const ChaseCamera = ({ bodyRef, getRotationY }) => {
   const { camera } = useThree();
@@ -15,7 +18,6 @@ const ChaseCamera = ({ bodyRef, getRotationY }) => {
 
   useEffect(() => {
     planePos.current.set(...SPAWN_POSITION);
-    camOffset.current.copy(CAMERA_OFFSET);
     lookPoint.current.copy(LOOK_AHEAD_OFFSET).add(planePos.current);
 
     camera.position.set(

@@ -32,6 +32,7 @@ const PlaneController = ({
   const targetVelocity = useRef(new Vector3(0, 0, 0));
   const smoothedHeading = useRef(0);
   const previousHeading = useRef(0);
+  const hasSpawned = useRef(false);
 
   const { scene, animations } = useGLTF(planeScene);
   const model = useMemo(() => scene.clone(true), [scene]);
@@ -43,11 +44,21 @@ const PlaneController = ({
   useEffect(() => {
     flight.current = createFlightState(0);
     smoothedHeading.current = 0;
+    hasSpawned.current = false;
   }, []);
 
   useFrame((_, delta) => {
     if (!bodyRef.current || !orientation.current || !planeRef.current) {
       return;
+    }
+
+    if (!hasSpawned.current) {
+      bodyRef.current.setTranslation(
+        { x: SPAWN_POSITION[0], y: SPAWN_POSITION[1], z: SPAWN_POSITION[2] },
+        true
+      );
+      bodyRef.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
+      hasSpawned.current = true;
     }
 
     const input = get();
@@ -97,7 +108,7 @@ const PlaneController = ({
 
     planeRef.current.rotation.x = MathUtils.lerp(
       planeRef.current.rotation.x,
-      attitude.pitch,
+      -attitude.pitch,
       0.12
     );
     planeRef.current.rotation.z = MathUtils.lerp(
