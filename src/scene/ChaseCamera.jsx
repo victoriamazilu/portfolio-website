@@ -15,6 +15,7 @@ const ChaseCamera = ({ bodyRef, getRotationY }) => {
   const camOffset = useRef(new Vector3());
   const lookPoint = useRef(new Vector3());
   const planePos = useRef(new Vector3());
+  const logTimer = useRef(0);
 
   useEffect(() => {
     planePos.current.set(...SPAWN_POSITION);
@@ -29,11 +30,20 @@ const ChaseCamera = ({ bodyRef, getRotationY }) => {
     camera.updateMatrixWorld();
   }, [camera]);
 
-  useFrame(() => {
+  useFrame((_, delta) => {
     if (!bodyRef.current) return;
 
     const t = bodyRef.current.translation();
     planePos.current.set(t.x, t.y, t.z);
+
+    logTimer.current += delta;
+    if (logTimer.current >= 3) {
+      logTimer.current = 0;
+      const c = camera.position;
+      const p = planePos.current;
+      const fmt = (v) => `[${v.x.toFixed(1)}, ${v.y.toFixed(1)}, ${v.z.toFixed(1)}]`;
+      console.log(`camera ${fmt(c)} | plane ${fmt(p)}`);
+    }
     const planeRotY = getRotationY();
 
     camOffset.current.copy(CAMERA_OFFSET);

@@ -1,17 +1,7 @@
 import { useMemo } from "react";
 import { Line } from "@react-three/drei";
-import { ISLAND_FLIGHT_PATH, getRingPoint } from "../constants/navigation";
-
-const buildRingPoints = ({ center, radiusX, radiusZ, segments }) => {
-  const points = [];
-
-  for (let i = 0; i <= segments; i++) {
-    const t = (i / segments) * Math.PI * 2;
-    points.push(getRingPoint({ center, radiusX, radiusZ }, t));
-  }
-
-  return points;
-};
+import { CatmullRomCurve3, Vector3 } from "three";
+import { ISLAND_FLIGHT_PATH } from "../constants/navigation";
 
 const PathMarker = ({ position, color, emissive }) => (
   <mesh position={position}>
@@ -29,23 +19,26 @@ const PathMarker = ({ position, color, emissive }) => (
 const IslandFlightPath = () => {
   const config = ISLAND_FLIGHT_PATH;
 
-  const { ringPoints, markerPoints } = useMemo(() => {
-    const ring = buildRingPoints(config);
-    const step = Math.max(1, Math.floor(config.segments / config.markerCount));
-    const markers = [];
+  const { linePoints, markerPoints } = useMemo(() => {
+    const curve = new CatmullRomCurve3(
+      config.waypoints.map((p) => new Vector3(...p)),
+      config.closed,
+      "catmullrom",
+      0.5
+    );
 
-    for (let i = 0; i < config.markerCount; i++) {
-      const index = i * step;
-      if (ring[index]) markers.push(ring[index]);
-    }
+    const line = curve.getPoints(config.segments).map((v) => [v.x, v.y, v.z]);
+    const markers = curve
+      .getSpacedPoints(config.markerCount)
+      .map((v) => [v.x, v.y, v.z]);
 
-    return { ringPoints: ring, markerPoints: markers };
+    return { linePoints: line, markerPoints: markers };
   }, [config]);
 
   return (
     <group>
       <Line
-        points={ringPoints}
+        points={linePoints}
         color={config.lineColor}
         lineWidth={config.lineWidth}
         dashed

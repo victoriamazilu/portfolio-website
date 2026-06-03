@@ -2,24 +2,34 @@ import { MathUtils } from "three";
 import { degToRad } from "three/src/math/MathUtils.js";
 
 export const FLIGHT_CONFIG = {
-  maxSpeed: 17,
+  maxSpeed: 13,
   minSpeed: -6,
-  acceleration: 9,
+  acceleration: 7,
   brakeForce: 14,
   reverseAcceleration: 13,
   drag: 0.28,
-  maxRoll: degToRad(36),
+  /** Bank starts shallow and deepens the longer you hold A/D */
+  baseRoll: degToRad(15),
+  maxRoll: degToRad(58),
   rollResponse: 0.13,
   rollReturn: 0.07,
+  /** Turn authority charges up while holding, decays when released */
+  turnChargeRate: 0.55,
+  turnChargeDecay: 2.2,
   /** Yaw rate scales with bank angle and forward speed */
-  turnRate: degToRad(54),
+  turnRate: degToRad(58),
   minTurnSpeed: 0.35,
   /** Creep forward when turning from a standstill with A/D */
   taxiSpeed: 5,
   taxiAcceleration: 14,
-  maxPitch: degToRad(18),
-  pitchResponse: 0.1,
-  pitchReturn: 0.08,
+  /** Pitch starts shallow and deepens the longer you hold W/S — mirrors banking */
+  basePitch: degToRad(8),
+  maxPitch: degToRad(40),
+  pitchResponse: 0.13,
+  pitchReturn: 0.07,
+  /** Climb authority charges up while holding, decays when released */
+  pitchChargeRate: 0.55,
+  pitchChargeDecay: 2.2,
   climbRate: 6,
   descendRate: 6,
   velocitySmoothing: 0.14,
@@ -35,6 +45,8 @@ export const createFlightState = (heading = 0) => ({
   pitch: 0,
   targetRoll: 0,
   targetPitch: 0,
+  turnCharge: 0,
+  pitchCharge: 0,
 });
 
 /**
@@ -64,8 +76,18 @@ export const stepFlightPhysics = (state, input, delta) => {
   }
   state.speed = clamp(state.speed, cfg.minSpeed, cfg.maxSpeed);
 
-  if (input.leftward) state.targetRoll = cfg.maxRoll;
-  else if (input.rightward) state.targetRoll = -cfg.maxRoll;
+  // Hold A/D to charge the turn — bank deepens over time for tighter circles
+  if (isTurning) {
+    state.turnCharge = clamp(state.turnCharge + cfg.turnChargeRate * dt, 0, 1);
+  } else {
+    state.turnCharge = clamp(state.turnCharge - cfg.turnChargeDecay * dt, 0, 1);
+  }
+
+  const chargedRoll =
+    cfg.baseRoll + (cfg.maxRoll - cfg.baseRoll) * state.turnCharge;
+
+  if (input.leftward) state.targetRoll = chargedRoll;
+  else if (input.rightward) state.targetRoll = -chargedRoll;
   else state.targetRoll = 0;
 
   const rollSmooth = state.targetRoll === 0 ? cfg.rollReturn : cfg.rollResponse;
@@ -93,8 +115,19 @@ export const stepFlightPhysics = (state, input, delta) => {
     }
   }
 
-  if (input.up) state.targetPitch = -cfg.maxPitch;
-  else if (input.down) state.targetPitch = cfg.maxPitch;
+  // Hold W/S to charge the climb — pitch deepens over time, like banking
+  const isPitching = input.up || input.down;
+  if (isPitching) {
+    state.pitchCharge = clamp(state.pitchCharge + cfg.pitchChargeRate * dt, 0, 1);
+  } else {
+    state.pitchCharge = clamp(state.pitchCharge - cfg.pitchChargeDecay * dt, 0, 1);
+  }
+
+  const chargedPitch =
+    cfg.basePitch + (cfg.maxPitch - cfg.basePitch) * state.pitchCharge;
+
+  if (input.up) state.targetPitch = -chargedPitch;
+  else if (input.down) state.targetPitch = chargedPitch;
   else state.targetPitch = 0;
 
   const pitchSmooth = state.targetPitch === 0 ? cfg.pitchReturn : cfg.pitchResponse;
@@ -108,8 +141,8 @@ export const stepFlightPhysics = (state, input, delta) => {
     x: forwardX * horizontalSpeed,
     y:
       state.speed * Math.sin(-state.pitch) +
-      (input.up ? cfg.climbRate : 0) +
-      (input.down ? -cfg.descendRate : 0),
+      (input.up ? cfg.climbRate * state.pitchCharge : 0) +
+      (input.down ? -cfg.descendRate * state.pitchCharge : 0),
     z: forwardZ * horizontalSpeed,
   };
 

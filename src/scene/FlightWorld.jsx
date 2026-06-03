@@ -7,6 +7,7 @@ import StaticIsland2 from "../models/StaticIsland2";
 import PlaneController from "./PlaneController";
 import ChaseCamera from "./ChaseCamera";
 import IslandFlightPath from "./IslandFlightPath";
+import Decorations from "./Decorations";
 import { ISLANDS, SHOW_ISLAND_2 } from "../constants/navigation";
 
 const WorldLights = () => (
@@ -64,6 +65,7 @@ const FlightWorld = ({ onFirstMove }) => {
         />
       )}
 
+      <Decorations />
       <IslandFlightPath />
 
       <Physics gravity={[0, 0, 0]}>
