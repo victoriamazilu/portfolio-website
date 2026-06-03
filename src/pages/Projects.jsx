@@ -6,14 +6,16 @@ import CTA from '../components/CTA';
 import BackButton from '../components/BackButton';
 
 
-const Projects = () => {
+const Projects = ({ embedded = false }) => {
   return (
     <section className="max-container">
       <div className="flex justify-between">
         <h1 className="head-text">My <span className="blue-gradient_text font-semibold drop-shadow">Projects</span></h1>
-        <div className="flex justify-end items-center">
-          <BackButton />
-        </div>
+        {!embedded && (
+          <div className="flex justify-end items-center">
+            <BackButton />
+          </div>
+        )}
       </div>
 
       <div className="mt-5 flex flex-col cap-3 text-slate-500">

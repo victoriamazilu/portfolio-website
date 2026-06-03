@@ -9,11 +9,15 @@ const Bird = ({...props}) => {
   const {actions} = useAnimations(animations, birdRef);
 
   useEffect(() => {
-    actions['Scene'].play();
-  }, [])
+    if (actions["Scene"]) {
+      actions["Scene"].play();
+    }
+  }, [actions]);
 
   useFrame(({ clock, camera }) => {
-    const radius = 6; //Radius for flight path
+    if (!birdRef.current) return;
+
+    const radius = 6;
     const speed = 0.25;
     const angle = clock.getElapsedTime() * speed;
     const depthOffset = -15; //Centre the flight path deeper in the screen
