@@ -10,6 +10,7 @@ import {
   createFlightState,
   stepFlightPhysics,
 } from "./flightPhysics";
+import { getPathGuidance } from "./flightPath";
 
 const PLANE_SCALE_MOBILE = 0.605;
 const PLANE_SCALE_DESKTOP = 1.21;
@@ -21,6 +22,7 @@ const PlaneController = ({
   motionRef,
   onFirstMove,
   onFlightChange,
+  assistEnabled = true,
 }) => {
   const orientation = useRef();
   const planeRef = useRef();
@@ -62,6 +64,12 @@ const PlaneController = ({
     }
 
     const input = get();
+    if (assistEnabled) {
+      const t = bodyRef.current.translation();
+      input.guide = getPathGuidance(t.x, t.z);
+    } else {
+      input.guide = null;
+    }
     const { velocity, attitude, speed, isMoving } = stepFlightPhysics(
       flight.current,
       input,

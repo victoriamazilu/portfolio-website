@@ -11,6 +11,7 @@ const Home = () => {
   const [showGestureHint, setShowGestureHint] = useState(true);
   const [hasInteracted, setHasInteracted] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [assistEnabled, setAssistEnabled] = useState(true);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -42,6 +43,19 @@ const Home = () => {
         </div>
       </div>
 
+      <div className="absolute top-6 right-6 z-20">
+        <button
+          type="button"
+          onClick={() => setAssistEnabled((v) => !v)}
+          className={`neo-brutalism-blue py-2 px-4 text-white text-xs lg:text-sm font-semibold transition-opacity ${
+            assistEnabled ? "opacity-100" : "opacity-60"
+          }`}
+          aria-pressed={assistEnabled}
+        >
+          Flight assist: {assistEnabled ? "ON" : "OFF"}
+        </button>
+      </div>
+
       <MovementInstructions visible={showGestureHint} />
 
       {showGestureHint && (
@@ -68,7 +82,10 @@ const Home = () => {
           }}
         >
           <Suspense fallback={<Loader />}>
-            <FlightWorld onFirstMove={handleFirstMove} />
+            <FlightWorld
+              onFirstMove={handleFirstMove}
+              assistEnabled={assistEnabled}
+            />
           </Suspense>
         </Canvas>
       </KeyboardControls>

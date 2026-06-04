@@ -34,7 +34,7 @@ const WorldLights = () => (
   </>
 );
 
-const FlightWorld = ({ onFirstMove }) => {
+const FlightWorld = ({ onFirstMove, assistEnabled = true }) => {
   const bodyRef = useRef();
   const headingRef = useRef(0);
   const motionRef = useRef({ speed: 0, yawRate: 0 });
@@ -74,6 +74,7 @@ const FlightWorld = ({ onFirstMove }) => {
           headingRef={headingRef}
           motionRef={motionRef}
           onFirstMove={onFirstMove}
+          assistEnabled={assistEnabled}
         />
       </Physics>
 

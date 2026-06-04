@@ -34,6 +34,11 @@ export const FLIGHT_CONFIG = {
   descendRate: 6,
   velocitySmoothing: 0.14,
   headingSmoothing: 0.1,
+  /** Path assist — gently steers the nose back onto the flight line */
+  assistRate: 5.2, // how fast heading eases toward the path (per second)
+  assistLateralGain: 0.05, // rad of steer-in per unit off the centerline
+  assistMaxAngle: degToRad(35), // cap on the steer-back angle
+  assistSteerScale: 0.25, // assist strength kept while the user is steering
 };
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
@@ -125,6 +130,31 @@ export const stepFlightPhysics = (state, input, delta) => {
 
   const chargedPitch =
     cfg.basePitch + (cfg.maxPitch - cfg.basePitch) * state.pitchCharge;
+
+  // Path assist: ease the nose toward the line so it's easy to stay on.
+  // Follows the path tangent and steers back toward the centerline; weaker
+  // while the user is actively turning so they always keep authority.
+  if (input.guide) {
+    const steerIn = clamp(
+      cfg.assistLateralGain * input.guide.lateral,
+      -cfg.assistMaxAngle,
+      cfg.assistMaxAngle
+    );
+    const desired = input.guide.heading + steerIn;
+    let diff = desired - state.heading;
+    diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+
+    const steerFactor = isTurning ? cfg.assistSteerScale : 1;
+    const moveFactor = clamp(state.speed / cfg.taxiSpeed, 0, 1);
+    const t = 1 - Math.exp(-cfg.assistRate * dt * steerFactor * moveFactor);
+    state.heading += diff * t;
+
+    if (!isTurning && moveFactor > 0.1) {
+      const assistRoll = clamp(diff * 1.2, -cfg.baseRoll, cfg.baseRoll);
+      state.targetRoll = assistRoll;
+      state.roll = MathUtils.lerp(state.roll, state.targetRoll, cfg.rollResponse);
+    }
+  }
 
   if (input.up) state.targetPitch = -chargedPitch;
   else if (input.down) state.targetPitch = chargedPitch;
