@@ -6,7 +6,7 @@ const MovementInstructions = ({ visible }) => {
   if (!visible) return null;
 
   return (
-    <div className="absolute bottom-6 right-6 z-10 max-w-xs">
+    <div className="absolute bottom-20 right-6 z-10 max-w-xs">
       <button
         type="button"
         onClick={() => setShowControls((prev) => !prev)}

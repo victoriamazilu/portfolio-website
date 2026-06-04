@@ -43,16 +43,25 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="absolute top-6 right-6 z-20">
+      <div className="absolute bottom-6 right-6 z-20">
         <button
           type="button"
           onClick={() => setAssistEnabled((v) => !v)}
-          className={`neo-brutalism-blue py-2 px-4 text-white text-xs lg:text-sm font-semibold transition-opacity ${
-            assistEnabled ? "opacity-100" : "opacity-60"
-          }`}
           aria-pressed={assistEnabled}
+          className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-lg shadow-md border border-white/60 px-3 py-2 text-xs font-semibold text-slate-700"
         >
-          Flight assist: {assistEnabled ? "ON" : "OFF"}
+          <span>Flight assist</span>
+          <span
+            className={`relative w-9 h-5 rounded-full transition-colors ${
+              assistEnabled ? "bg-blue-500" : "bg-slate-300"
+            }`}
+          >
+            <span
+              className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+                assistEnabled ? "translate-x-4" : ""
+              }`}
+            />
+          </span>
         </button>
       </div>
 
