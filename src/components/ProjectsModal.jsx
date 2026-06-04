@@ -29,9 +29,7 @@ const ProjectsModal = ({ isOpen, onClose }) => {
           ×
         </button>
 
-        <div className="px-2 pb-6 -mt-6">
-          <Projects embedded />
-        </div>
+        <Projects embedded />
       </div>
     </div>
   );

@@ -29,9 +29,7 @@ const ExperienceModal = ({ isOpen, onClose }) => {
           ×
         </button>
 
-        <div className="px-2 pb-6 -mt-6">
-          <Experience embedded />
-        </div>
+        <Experience embedded />
       </div>
     </div>
   );

@@ -1,72 +1,92 @@
-import React from 'react'
-import {projects} from '../constants'
-import { Link } from "react-router-dom";
-import { arrow } from '../assets/icons';
-import CTA from '../components/CTA';
-import BackButton from '../components/BackButton';
+import { projects } from "../constants";
+import BackButton from "../components/BackButton";
 
+const Arrow = () => (
+  <svg
+    width="22"
+    height="22"
+    viewBox="0 0 24 24"
+    fill="none"
+    className="proj-arrow text-[#16150f]"
+  >
+    <path
+      d="M7 17L17 7M17 7H9M17 7V15"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
 
 const Projects = ({ embedded = false }) => {
   return (
-    <section className="max-container">
-      <div className="flex justify-between">
-        <h1 className="head-text">My <span className="blue-gradient_text font-semibold drop-shadow">Projects</span></h1>
-        {!embedded && (
-          <div className="flex justify-end items-center">
-            <BackButton />
-          </div>
-        )}
+    <section
+      className={`work-page ${
+        embedded ? "px-7 sm:px-12 py-12 max-w-3xl mx-auto" : "max-container"
+      }`}
+    >
+      <div className="flex items-start justify-between gap-6">
+        <header>
+          <p className="work-eyebrow">Selected work</p>
+          <h1 className="work-serif text-6xl sm:text-8xl mt-5">Projects</h1>
+        </header>
+        {!embedded && <BackButton />}
       </div>
 
-      <div className="mt-5 flex flex-col cap-3 text-slate-500">
-        <p>Recently, I've been sharpening my skills through personal projects. Here are a few of the projects I've been working on, each presenting unique challenges and learning opportunities.  Lots more to come in the future!</p>
-      </div>
+      <p className="text-[15px] leading-relaxed text-[#56544c] mt-6 max-w-md">
+        Things I've designed and built — from full-stack web apps to playful
+        hardware experiments. Plenty more on the way.
+      </p>
 
-      <div className="flex flex-wrap my-20 gap-16">
-        {projects.map((project) => (
-          <div className="lg:w-400 w-full" key={project.name}>
-            <div className="block-container w-12 h-12">
-              <div className={`btn-back rounded-xl ${project.theme}`}/>
-              <div className="btn-front rounded-xl flex justify-center items-center">
-                <img 
-                  src={project.iconUrl}
-                  alt="Project Icon"
-                  className="w-1/2 h-1/2 object-contain"
-                />
+      <div className="mt-14">
+        {projects.map((project, i) => {
+          const href = project.liveLink || project.link;
+          return (
+            <a
+              key={project.name}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="proj-row group block"
+            >
+              <div className="flex items-start gap-5 sm:gap-8">
+                <span className="work-meta pt-2.5 shrink-0">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-4">
+                    <h3 className="proj-name work-serif text-3xl sm:text-5xl text-[#16150f]">
+                      {project.name}
+                    </h3>
+                    <Arrow />
+                  </div>
+
+                  {project.role && (
+                    <p className="proj-desc work-meta mt-2">{project.role}</p>
+                  )}
+
+                  <p className="proj-desc text-sm leading-relaxed text-[#56544c] mt-3 max-w-xl line-clamp-2">
+                    {project.description}
+                  </p>
+
+                  <div className="proj-desc flex items-center gap-6 mt-4">
+                    {project.liveLink && (
+                      <span className="work-link">Live ↗</span>
+                    )}
+                    {project.link && (
+                      <span className="work-link">GitHub ↗</span>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-            <div className="mt-5 flex flex-col">
-              <h4 className="text-2xl font-poppins font-semibold">{project.name}</h4>
-              {project.role && 
-                <h4 className="text-medium font-poppins">Role: {project.role}</h4>
-              }
-              <p className="mt-2 text-slate-500">{project.description}</p>
-              {project.link && 
-                <div className="mt-5 flex items-center gap-2 font-poppins">
-                <Link to={project.link} target="_blank" rel="noopener noreferrer" className="font-semibold text-blue-600">
-                  Github Link
-                </Link>
-                <img src={arrow} alt="arrow" className="w-4 h-4 object-contain"/>
-                </div>
-              }
-              {project.liveLink && 
-                <div className="mt-2 flex items-center gap-2 font-poppins">
-                  <Link to={project.liveLink} target="_blank" rel="noopener noreferrer" className="font-semibold text-blue-600">
-                    Live Link
-                  </Link>
-                  <img src={arrow} alt="arrow" className="w-4 h-4 object-contain"/>
-                </div>
-              }
-            </div>
-          </div>
-        ))}
+            </a>
+          );
+        })}
       </div>
-
-      <hr className="border-slate-200" />
-
-      <CTA />
     </section>
-  )
-}
+  );
+};
 
-export default Projects
+export default Projects;
