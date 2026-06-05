@@ -8,7 +8,7 @@ import "react-vertical-timeline-component/style.min.css";
 import CTA from "../components/CTA";
 import BackButton from "../components/BackButton";
 
-const Experience = () => {
+const Experience = ({ embedded = false }) => {
   return (
     <section className="max-container">
       <div className="flex justify-between">
@@ -19,9 +19,11 @@ const Experience = () => {
           </span>{" "}
           👋
         </h1>
-        <div className="flex justify-end items-center">
-          <BackButton />
-        </div>
+        {!embedded && (
+          <div className="flex justify-end items-center">
+            <BackButton />
+          </div>
+        )}
       </div>
       <div className="mt-5 flex flex-col cap-3 text-slate-500">
         <p>

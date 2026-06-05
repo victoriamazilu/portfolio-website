@@ -3,6 +3,7 @@ import { KeyboardControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import Loader from "../components/Loader";
 import ContactModal from "../components/ContactModal";
+import ExperienceModal from "../components/ExperienceModal";
 import MovementInstructions from "../components/MovementInstructions";
 import FlightWorld from "../scene/FlightWorld";
 import { keyboardMap, INITIAL_CAMERA_POSITION } from "../constants/navigation";
@@ -11,6 +12,8 @@ const Home = () => {
   const [showGestureHint, setShowGestureHint] = useState(true);
   const [hasInteracted, setHasInteracted] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [isExperienceOpen, setIsExperienceOpen] = useState(false);
+  const [flightFrozen, setFlightFrozen] = useState(false);
   const [assistEnabled, setAssistEnabled] = useState(true);
 
   useEffect(() => {
@@ -94,6 +97,9 @@ const Home = () => {
             <FlightWorld
               onFirstMove={handleFirstMove}
               assistEnabled={assistEnabled}
+              flightFrozen={flightFrozen}
+              onExperienceUnlockStart={() => setFlightFrozen(true)}
+              onExperienceUnlock={() => setIsExperienceOpen(true)}
             />
           </Suspense>
         </Canvas>
@@ -102,6 +108,14 @@ const Home = () => {
       <ContactModal
         isOpen={isContactModalOpen}
         onClose={() => setIsContactModalOpen(false)}
+      />
+
+      <ExperienceModal
+        isOpen={isExperienceOpen}
+        onClose={() => {
+          setIsExperienceOpen(false);
+          setFlightFrozen(false);
+        }}
       />
     </section>
   );

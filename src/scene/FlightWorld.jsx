@@ -34,7 +34,13 @@ const WorldLights = () => (
   </>
 );
 
-const FlightWorld = ({ onFirstMove, assistEnabled = true }) => {
+const FlightWorld = ({
+  onFirstMove,
+  assistEnabled = true,
+  onExperienceUnlock,
+  onExperienceUnlockStart,
+  flightFrozen = false,
+}) => {
   const bodyRef = useRef();
   const headingRef = useRef(0);
   const motionRef = useRef({ speed: 0, yawRate: 0 });
@@ -65,7 +71,11 @@ const FlightWorld = ({ onFirstMove, assistEnabled = true }) => {
         />
       )}
 
-      <Decorations />
+      <Decorations
+        bodyRef={bodyRef}
+        onExperienceUnlock={onExperienceUnlock}
+        onExperienceUnlockStart={onExperienceUnlockStart}
+      />
       <IslandFlightPath />
 
       <Physics gravity={[0, 0, 0]}>
@@ -75,6 +85,7 @@ const FlightWorld = ({ onFirstMove, assistEnabled = true }) => {
           motionRef={motionRef}
           onFirstMove={onFirstMove}
           assistEnabled={assistEnabled}
+          frozen={flightFrozen}
         />
       </Physics>
 

@@ -3,6 +3,9 @@ export const SHOW_ISLAND_2 = false;
 /** Plane spawn — back of the scene, facing +Z toward the island */
 export const SPAWN_POSITION = [0, 2, -105];
 
+/** The plane mesh is rendered this far above its rigid body on Y */
+export const PLANE_VISUAL_Y_OFFSET = 5;
+
 /**
  * Explore path: starts at the plane spawn, flies forward through the
  * island, then curves around it to guide the user. Smoothed into a

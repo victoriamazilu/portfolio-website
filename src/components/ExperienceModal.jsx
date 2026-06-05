@@ -1,0 +1,40 @@
+import { useEffect, useState } from "react";
+import Experience from "../pages/Experience";
+
+const ExperienceModal = ({ isOpen, onClose }) => {
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      const id = requestAnimationFrame(() => setShow(true));
+      return () => cancelAnimationFrame(id);
+    }
+    setShow(false);
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div
+        className={`bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto relative transition-all duration-300 ${
+          show ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 translate-y-4"
+        }`}
+      >
+        <button
+          onClick={onClose}
+          className="sticky top-4 left-full -ml-12 z-10 text-gray-400 hover:text-gray-700 text-3xl leading-none"
+          aria-label="Close"
+        >
+          ×
+        </button>
+
+        <div className="px-2 pb-6 -mt-6">
+          <Experience embedded />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ExperienceModal;

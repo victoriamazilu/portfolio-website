@@ -4,7 +4,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { CapsuleCollider, RigidBody } from "@react-three/rapier";
 import { MathUtils, Vector3 } from "three";
 import planeScene from "../assets/3d/plane.glb";
-import { SPAWN_POSITION } from "../constants/navigation";
+import { SPAWN_POSITION, PLANE_VISUAL_Y_OFFSET } from "../constants/navigation";
 import {
   FLIGHT_CONFIG,
   createFlightState,
@@ -14,7 +14,7 @@ import { getPathGuidance } from "./flightPath";
 
 const PLANE_SCALE_MOBILE = 0.605;
 const PLANE_SCALE_DESKTOP = 1.21;
-const PLANE_VISUAL_Y_OFFSET = 5;
+const ZERO_VELOCITY = new Vector3(0, 0, 0);
 
 const PlaneController = ({
   bodyRef,
@@ -23,6 +23,7 @@ const PlaneController = ({
   onFirstMove,
   onFlightChange,
   assistEnabled = true,
+  frozen = false,
 }) => {
   const orientation = useRef();
   const planeRef = useRef();
@@ -61,6 +62,20 @@ const PlaneController = ({
       );
       bodyRef.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
       hasSpawned.current = true;
+    }
+
+    if (frozen) {
+      currentVelocity.current.lerp(ZERO_VELOCITY, 0.06);
+      bodyRef.current.setLinvel(
+        {
+          x: currentVelocity.current.x,
+          y: currentVelocity.current.y,
+          z: currentVelocity.current.z,
+        },
+        true
+      );
+      flight.current.speed *= 0.92;
+      return;
     }
 
     const input = get();

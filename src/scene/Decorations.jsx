@@ -1,19 +1,78 @@
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { DECORATIONS } from "../constants/navigation";
+import { DECORATIONS, PLANE_VISUAL_Y_OFFSET } from "../constants/navigation";
 
-const Hoop = ({ position, rotation = [0, 0, 0], scale = 1, color = "#ffdd57" }) => {
+const UNLOCK_DURATION = 1.4;
+const TRIGGER_DIST = 4.5;
+
+const Hoop = ({
+  position,
+  rotation = [0, 0, 0],
+  scale = 1,
+  color = "#ffdd57",
+  unlockable = false,
+  bodyRef,
+  onUnlock,
+  onUnlockStart,
+}) => {
+  const groupRef = useRef();
   const ringRef = useRef();
+  const matRef = useRef();
+  const shockRef = useRef();
+  const shockMatRef = useRef();
+  const phase = useRef("locked"); // locked -> unlocking -> done
+  const elapsed = useRef(0);
 
   useFrame((_, delta) => {
-    if (ringRef.current) ringRef.current.rotation.z += delta * 0.6;
+    const ring = ringRef.current;
+    if (!ring) return;
+
+    const spinSpeed = phase.current === "unlocking" ? 6 : 0.6;
+    ring.rotation.z += delta * spinSpeed;
+
+    if (unlockable && phase.current === "locked" && bodyRef?.current) {
+      const p = bodyRef.current.translation();
+      // The plane mesh sits PLANE_VISUAL_Y_OFFSET above the rigid body, so
+      // compare against where the plane *looks* like it is, not the body.
+      const dx = p.x - position[0];
+      const dy = p.y + PLANE_VISUAL_Y_OFFSET - position[1];
+      const dz = p.z - position[2];
+      if (dx * dx + dy * dy + dz * dz < TRIGGER_DIST * TRIGGER_DIST) {
+        phase.current = "unlocking";
+        elapsed.current = 0;
+        onUnlockStart?.();
+      }
+    }
+
+    if (phase.current === "unlocking") {
+      elapsed.current += delta;
+      const k = Math.min(elapsed.current / UNLOCK_DURATION, 1);
+      const wave = Math.sin(k * Math.PI);
+
+      if (groupRef.current) groupRef.current.scale.setScalar(scale * (1 + wave * 0.55));
+      if (matRef.current) matRef.current.emissiveIntensity = 0.85 + wave * 3.5;
+
+      if (shockRef.current && shockMatRef.current) {
+        shockRef.current.scale.setScalar(1 + k * 2.4);
+        shockMatRef.current.opacity = (1 - k) * 0.9;
+      }
+
+      if (k >= 1) {
+        phase.current = "done";
+        if (groupRef.current) groupRef.current.scale.setScalar(scale);
+        if (matRef.current) matRef.current.emissiveIntensity = 1.8;
+        if (shockMatRef.current) shockMatRef.current.opacity = 0;
+        onUnlock?.();
+      }
+    }
   });
 
   return (
-    <group position={position} rotation={rotation} scale={scale}>
+    <group ref={groupRef} position={position} rotation={rotation} scale={scale}>
       <mesh ref={ringRef}>
         <torusGeometry args={[2.2, 0.22, 16, 40]} />
         <meshStandardMaterial
+          ref={matRef}
           color={color}
           emissive={color}
           emissiveIntensity={0.85}
@@ -21,6 +80,18 @@ const Hoop = ({ position, rotation = [0, 0, 0], scale = 1, color = "#ffdd57" }) 
           roughness={0.25}
         />
       </mesh>
+
+      {unlockable && (
+        <mesh ref={shockRef}>
+          <torusGeometry args={[2.2, 0.08, 16, 48]} />
+          <meshBasicMaterial
+            ref={shockMatRef}
+            color={color}
+            transparent
+            opacity={0}
+          />
+        </mesh>
+      )}
     </group>
   );
 };
@@ -46,10 +117,17 @@ const Cloud = ({ position, scale = 1 }) => (
   </group>
 );
 
-const Decorations = () => (
+const Decorations = ({ bodyRef, onExperienceUnlock, onExperienceUnlockStart }) => (
   <group>
     {DECORATIONS.hoops.map((h, i) => (
-      <Hoop key={`hoop-${i}`} {...h} />
+      <Hoop
+        key={`hoop-${i}`}
+        {...h}
+        unlockable={i === 0}
+        bodyRef={i === 0 ? bodyRef : undefined}
+        onUnlock={i === 0 ? onExperienceUnlock : undefined}
+        onUnlockStart={i === 0 ? onExperienceUnlockStart : undefined}
+      />
     ))}
     {DECORATIONS.clouds.map((c, i) => (
       <Cloud key={`cloud-${i}`} {...c} />
