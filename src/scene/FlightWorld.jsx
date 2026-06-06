@@ -39,6 +39,8 @@ const FlightWorld = ({
   assistEnabled = true,
   onExperienceUnlock,
   onExperienceUnlockStart,
+  onProjectsUnlock,
+  onProjectsUnlockStart,
   flightFrozen = false,
 }) => {
   const bodyRef = useRef();
@@ -75,6 +77,8 @@ const FlightWorld = ({
         bodyRef={bodyRef}
         onExperienceUnlock={onExperienceUnlock}
         onExperienceUnlockStart={onExperienceUnlockStart}
+        onProjectsUnlock={onProjectsUnlock}
+        onProjectsUnlockStart={onProjectsUnlockStart}
       />
       <IslandFlightPath />
 

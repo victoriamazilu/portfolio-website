@@ -4,6 +4,7 @@ import { Canvas } from "@react-three/fiber";
 import Loader from "../components/Loader";
 import ContactModal from "../components/ContactModal";
 import ExperienceModal from "../components/ExperienceModal";
+import ProjectsModal from "../components/ProjectsModal";
 import MovementInstructions from "../components/MovementInstructions";
 import FlightWorld from "../scene/FlightWorld";
 import { keyboardMap, INITIAL_CAMERA_POSITION } from "../constants/navigation";
@@ -13,6 +14,7 @@ const Home = () => {
   const [hasInteracted, setHasInteracted] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isExperienceOpen, setIsExperienceOpen] = useState(false);
+  const [isProjectsOpen, setIsProjectsOpen] = useState(false);
   const [flightFrozen, setFlightFrozen] = useState(false);
   const [assistEnabled, setAssistEnabled] = useState(true);
 
@@ -100,6 +102,8 @@ const Home = () => {
               flightFrozen={flightFrozen}
               onExperienceUnlockStart={() => setFlightFrozen(true)}
               onExperienceUnlock={() => setIsExperienceOpen(true)}
+              onProjectsUnlockStart={() => setFlightFrozen(true)}
+              onProjectsUnlock={() => setIsProjectsOpen(true)}
             />
           </Suspense>
         </Canvas>
@@ -114,6 +118,14 @@ const Home = () => {
         isOpen={isExperienceOpen}
         onClose={() => {
           setIsExperienceOpen(false);
+          setFlightFrozen(false);
+        }}
+      />
+
+      <ProjectsModal
+        isOpen={isProjectsOpen}
+        onClose={() => {
+          setIsProjectsOpen(false);
           setFlightFrozen(false);
         }}
       />

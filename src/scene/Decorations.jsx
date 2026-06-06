@@ -117,22 +117,35 @@ const Cloud = ({ position, scale = 1 }) => (
   </group>
 );
 
-const Decorations = ({ bodyRef, onExperienceUnlock, onExperienceUnlockStart }) => (
+const Decorations = ({
+  bodyRef,
+  onExperienceUnlock,
+  onExperienceUnlockStart,
+  onProjectsUnlock,
+  onProjectsUnlockStart,
+}) => {
+  const unlockHandlers = [
+    { onUnlock: onExperienceUnlock, onUnlockStart: onExperienceUnlockStart },
+    { onUnlock: onProjectsUnlock, onUnlockStart: onProjectsUnlockStart },
+  ];
+
+  return (
   <group>
     {DECORATIONS.hoops.map((h, i) => (
       <Hoop
         key={`hoop-${i}`}
         {...h}
-        unlockable={i === 0}
-        bodyRef={i === 0 ? bodyRef : undefined}
-        onUnlock={i === 0 ? onExperienceUnlock : undefined}
-        onUnlockStart={i === 0 ? onExperienceUnlockStart : undefined}
+        unlockable={i < unlockHandlers.length}
+        bodyRef={i < unlockHandlers.length ? bodyRef : undefined}
+        onUnlock={unlockHandlers[i]?.onUnlock}
+        onUnlockStart={unlockHandlers[i]?.onUnlockStart}
       />
     ))}
     {DECORATIONS.clouds.map((c, i) => (
       <Cloud key={`cloud-${i}`} {...c} />
     ))}
   </group>
-);
+  );
+};
 
 export default Decorations;
