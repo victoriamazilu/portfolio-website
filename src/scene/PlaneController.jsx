@@ -16,12 +16,18 @@ const PLANE_SCALE_MOBILE = 0.605;
 const PLANE_SCALE_DESKTOP = 1.21;
 const ZERO_VELOCITY = new Vector3(0, 0, 0);
 
+// Cinematic intro: plane swoops in from high/far back down to the spawn.
+const INTRO_ENTRY = [0, 18, -185];
+const INTRO_DURATION = 3.2;
+const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
 const PlaneController = ({
   bodyRef,
   headingRef,
   motionRef,
   onFirstMove,
   onFlightChange,
+  onIntroComplete,
   assistEnabled = true,
   frozen = false,
 }) => {
@@ -36,6 +42,8 @@ const PlaneController = ({
   const smoothedHeading = useRef(0);
   const previousHeading = useRef(0);
   const hasSpawned = useRef(false);
+  const introActive = useRef(true);
+  const introTime = useRef(0);
 
   const { scene, animations } = useGLTF(planeScene);
   const model = useMemo(() => scene.clone(true), [scene]);
@@ -57,11 +65,49 @@ const PlaneController = ({
 
     if (!hasSpawned.current) {
       bodyRef.current.setTranslation(
-        { x: SPAWN_POSITION[0], y: SPAWN_POSITION[1], z: SPAWN_POSITION[2] },
+        { x: INTRO_ENTRY[0], y: INTRO_ENTRY[1], z: INTRO_ENTRY[2] },
         true
       );
       bodyRef.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
       hasSpawned.current = true;
+      introActive.current = true;
+      introTime.current = 0;
+    }
+
+    if (introActive.current) {
+      introTime.current += delta;
+      const k = Math.min(introTime.current / INTRO_DURATION, 1);
+      const e = easeOutCubic(k);
+
+      bodyRef.current.setTranslation(
+        {
+          x: MathUtils.lerp(INTRO_ENTRY[0], SPAWN_POSITION[0], e),
+          y: MathUtils.lerp(INTRO_ENTRY[1], SPAWN_POSITION[1], e),
+          z: MathUtils.lerp(INTRO_ENTRY[2], SPAWN_POSITION[2], e),
+        },
+        true
+      );
+      bodyRef.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
+
+      orientation.current.rotation.y = 0;
+      headingRef.current = 0;
+      smoothedHeading.current = 0;
+      previousHeading.current = 0;
+
+      // gentle dive that levels off as it settles into the spawn
+      const dive = (1 - e) * 0.22;
+      planeRef.current.rotation.x = MathUtils.lerp(planeRef.current.rotation.x, dive, 0.12);
+      planeRef.current.rotation.z = MathUtils.lerp(planeRef.current.rotation.z, 0, 0.12);
+
+      if (actions["Take 001"]) actions["Take 001"].play();
+
+      if (k >= 1) {
+        introActive.current = false;
+        flight.current = createFlightState(0);
+        currentVelocity.current.set(0, 0, 0);
+        onIntroComplete?.();
+      }
+      return;
     }
 
     if (frozen) {

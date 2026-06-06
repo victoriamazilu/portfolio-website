@@ -41,6 +41,7 @@ const FlightWorld = ({
   onExperienceUnlockStart,
   onProjectsUnlock,
   onProjectsUnlockStart,
+  onIntroComplete,
   flightFrozen = false,
 }) => {
   const bodyRef = useRef();
@@ -90,6 +91,7 @@ const FlightWorld = ({
           onFirstMove={onFirstMove}
           assistEnabled={assistEnabled}
           frozen={flightFrozen}
+          onIntroComplete={onIntroComplete}
         />
       </Physics>
 

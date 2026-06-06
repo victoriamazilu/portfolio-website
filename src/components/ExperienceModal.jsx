@@ -23,7 +23,7 @@ const ExperienceModal = ({ isOpen, onClose }) => {
       >
         <button
           onClick={onClose}
-          className="sticky top-4 left-full -ml-12 z-10 text-gray-400 hover:text-gray-700 text-3xl leading-none"
+          className="absolute top-4 right-[16px] z-10 text-gray-400 hover:text-gray-700 text-3xl leading-none"
           aria-label="Close"
         >
           ×

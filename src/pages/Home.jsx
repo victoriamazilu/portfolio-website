@@ -5,6 +5,7 @@ import Loader from "../components/Loader";
 import ContactModal from "../components/ContactModal";
 import ExperienceModal from "../components/ExperienceModal";
 import ProjectsModal from "../components/ProjectsModal";
+import InstructionsModal from "../components/InstructionsModal";
 import MovementInstructions from "../components/MovementInstructions";
 import FlightWorld from "../scene/FlightWorld";
 import { keyboardMap, INITIAL_CAMERA_POSITION } from "../constants/navigation";
@@ -17,6 +18,13 @@ const Home = () => {
   const [isProjectsOpen, setIsProjectsOpen] = useState(false);
   const [flightFrozen, setFlightFrozen] = useState(false);
   const [assistEnabled, setAssistEnabled] = useState(true);
+  const [introComplete, setIntroComplete] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(false);
+
+  const handleIntroComplete = () => {
+    setIntroComplete(true);
+    setShowInstructions(true);
+  };
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -39,16 +47,18 @@ const Home = () => {
 
   return (
     <section className="w-full h-screen relative">
-      <div className="absolute top-24 left-0 right-0 z-10 flex items-center justify-center pointer-events-none">
-        <div className="text-center neo-brutalism-blue py-3 px-8 text-white mx-6 max-w-lg">
-          <p className="text-sm lg:text-lg font-semibold">Hi, I'm Victoria! 👋</p>
-          <p className="text-xs lg:text-sm mt-1 opacity-90">
-            Fly to the islands — Experience & Projects coming soon as destinations.
-          </p>
+      {introComplete && !showInstructions && (
+        <div className="absolute top-24 left-0 right-0 z-10 flex items-center justify-center pointer-events-none">
+          <div className="text-center neo-brutalism-blue py-3 px-8 text-white mx-6 max-w-lg">
+            <p className="text-sm lg:text-lg font-semibold">Hi, I'm Victoria! 👋</p>
+            <p className="text-xs lg:text-sm mt-1 opacity-90">
+              Fly through the hoops to explore my experience & projects.
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
-      <div className="absolute bottom-6 right-6 z-20">
+      <div className={`absolute bottom-6 right-6 z-20 ${introComplete ? "" : "hidden"}`}>
         <button
           type="button"
           onClick={() => setAssistEnabled((v) => !v)}
@@ -70,9 +80,9 @@ const Home = () => {
         </button>
       </div>
 
-      <MovementInstructions visible={showGestureHint} />
+      <MovementInstructions visible={introComplete && showGestureHint} />
 
-      {showGestureHint && (
+      {introComplete && showGestureHint && (
         <div className="absolute bottom-24 left-0 right-0 z-10 flex items-center justify-center pointer-events-none">
           <div className="text-sm text-center neo-brutalism-blue py-2 px-6 text-white mx-10 opacity-90 animate-pulse">
             Press W to fly forward — follow the dotted ring around the island
@@ -104,6 +114,7 @@ const Home = () => {
               onExperienceUnlock={() => setIsExperienceOpen(true)}
               onProjectsUnlockStart={() => setFlightFrozen(true)}
               onProjectsUnlock={() => setIsProjectsOpen(true)}
+              onIntroComplete={handleIntroComplete}
             />
           </Suspense>
         </Canvas>
@@ -128,6 +139,13 @@ const Home = () => {
           setIsProjectsOpen(false);
           setFlightFrozen(false);
         }}
+      />
+
+      <InstructionsModal
+        isOpen={showInstructions}
+        onClose={() => setShowInstructions(false)}
+        assistEnabled={assistEnabled}
+        onAssistChange={setAssistEnabled}
       />
     </section>
   );

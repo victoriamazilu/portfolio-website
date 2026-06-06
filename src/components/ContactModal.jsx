@@ -48,7 +48,7 @@ const ContactModal = ({ isOpen, onClose }) => {
       <div className="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full mx-4 relative">
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl"
+          className="absolute top-2.5 right-2.5 text-gray-500 hover:text-gray-700 text-2xl"
         >
           ×
         </button>
