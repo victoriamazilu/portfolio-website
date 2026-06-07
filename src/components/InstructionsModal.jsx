@@ -105,7 +105,7 @@ const InstructionsModal = ({
           onClick={onClose}
           className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2.5 rounded-lg transition-colors"
         >
-          Start flying
+          Start
         </button>
       </div>
     </div>

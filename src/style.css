@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Work+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Work+Sans:wght@100;200;300;400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -85,6 +85,130 @@ body:has(.card[data-color="green"]:hover) {
   -webkit-backdrop-filter: blur(10px);
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* ============================================================
+   Editorial "work" pages (Experience / Projects)
+   Restrained, monochrome, serif-display aesthetic.
+   ============================================================ */
+.work-page {
+  --ink: #16150f;
+  --muted: #8c897e;
+  --faint: #b6b3a8;
+  --hair: #e7e4db;
+  --paper: #ffffff;
+  --wash: #faf9f6;
+  color: var(--ink);
+  font-family: "Inter", "Work Sans", sans-serif;
+  font-feature-settings: "ss01", "cv01";
+}
+
+.work-eyebrow {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.32em;
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.work-serif {
+  font-family: "Instrument Serif", "Times New Roman", serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 0.94;
+}
+
+.work-meta {
+  font-family: ui-monospace, "SFMono-Regular", Menlo, monospace;
+  font-size: 0.74rem;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.work-rule {
+  height: 1px;
+  width: 100%;
+  background: var(--hair);
+}
+
+/* --- Experience rows --- */
+.exp-row {
+  display: grid;
+  gap: 0.5rem 2.5rem;
+  padding: 1.9rem 0;
+  border-top: 1px solid var(--hair);
+}
+@media (min-width: 720px) {
+  .exp-row {
+    grid-template-columns: 150px 1fr;
+  }
+}
+.exp-logo {
+  filter: grayscale(1);
+  opacity: 0.85;
+  transition: filter 0.4s ease, opacity 0.4s ease;
+}
+.exp-row:hover .exp-logo {
+  filter: grayscale(0);
+  opacity: 1;
+}
+.exp-company {
+  position: relative;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  transition: background-size 0.35s ease;
+}
+.exp-company:hover {
+  background-size: 100% 1px;
+}
+
+/* --- Project index list --- */
+.proj-row {
+  position: relative;
+  display: block;
+  padding: 1.6rem 0;
+  border-top: 1px solid var(--hair);
+}
+.proj-row:last-child {
+  border-bottom: 1px solid var(--hair);
+}
+.proj-row .proj-arrow {
+  opacity: 0;
+  transform: translate(-6px, 6px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.proj-row:hover .proj-arrow {
+  opacity: 1;
+  transform: translate(0, 0);
+}
+.proj-name {
+  transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1), color 0.3s ease;
+}
+.proj-row:hover .proj-name {
+  transform: translateX(10px);
+}
+.proj-desc {
+  transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.proj-row:hover .proj-desc {
+  transform: translateX(10px);
+}
+.work-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--muted);
+  transition: color 0.25s ease, gap 0.25s ease;
+}
+.work-link:hover {
+  color: var(--ink);
+  gap: 0.55rem;
 }
 
 .logo {
