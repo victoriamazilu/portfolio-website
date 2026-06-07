@@ -11,6 +11,7 @@ import {
   stepFlightPhysics,
 } from "./flightPhysics";
 import { getPathGuidance } from "./flightPath";
+import { touchInput } from "./touchControls";
 
 const PLANE_SCALE_MOBILE = 0.605;
 const PLANE_SCALE_DESKTOP = 1.21;
@@ -124,7 +125,15 @@ const PlaneController = ({
       return;
     }
 
-    const input = get();
+    const ki = get();
+    const input = {
+      forward: ki.forward || touchInput.forward,
+      backward: ki.backward || touchInput.backward,
+      leftward: ki.leftward || touchInput.leftward,
+      rightward: ki.rightward || touchInput.rightward,
+      up: ki.up || touchInput.up,
+      down: ki.down || touchInput.down,
+    };
     if (assistEnabled) {
       const t = bodyRef.current.translation();
       input.guide = getPathGuidance(t.x, t.z);
