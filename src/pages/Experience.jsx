@@ -64,7 +64,7 @@ const Experience = ({ embedded = false }) => {
                     <img
                       src={exp.icon}
                       alt={exp.company_name}
-                      className="exp-logo w-[80%] h-[80%] object-contain"
+                      className="w-[80%] h-[80%] object-contain"
                     />
                   </span>
                   <h3 className="text-[1.05rem] font-medium text-[#16150f] tracking-tight">

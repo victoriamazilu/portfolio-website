@@ -145,15 +145,6 @@ body:has(.card[data-color="green"]:hover) {
     grid-template-columns: 150px 1fr;
   }
 }
-.exp-logo {
-  filter: grayscale(1);
-  opacity: 0.85;
-  transition: filter 0.4s ease, opacity 0.4s ease;
-}
-.exp-row:hover .exp-logo {
-  filter: grayscale(0);
-  opacity: 1;
-}
 .exp-company {
   position: relative;
   background-image: linear-gradient(currentColor, currentColor);

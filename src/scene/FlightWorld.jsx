@@ -81,7 +81,7 @@ const FlightWorld = ({
         onProjectsUnlock={onProjectsUnlock}
         onProjectsUnlockStart={onProjectsUnlockStart}
       />
-      <IslandFlightPath />
+      <IslandFlightPath bodyRef={bodyRef} />
 
       <Physics gravity={[0, 0, 0]}>
         <PlaneController
