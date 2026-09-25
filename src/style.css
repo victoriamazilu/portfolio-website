@@ -202,6 +202,37 @@ body:has(.card[data-color="green"]:hover) {
   gap: 0.55rem;
 }
 
+.preai-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  list-style: none;
+  font-size: 13px;
+  letter-spacing: 0.025em;
+  color: var(--muted);
+  transition: color 0.25s ease;
+}
+.preai-toggle::-webkit-details-marker {
+  display: none;
+}
+.preai-toggle::marker {
+  content: "";
+}
+.preai-toggle:hover {
+  color: var(--ink);
+}
+.preai-toggle:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: 4px;
+}
+.preai-caret {
+  transition: transform 0.3s ease;
+}
+.preai[open] .preai-caret {
+  transform: rotate(90deg);
+}
+
 .logo {
   border-radius: 8.889px;
   background: #fff;

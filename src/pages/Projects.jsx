@@ -1,4 +1,4 @@
-import { projects } from "../constants";
+import { projects, preAiProjects } from "../constants";
 import BackButton from "../components/BackButton";
 
 const Arrow = () => (
@@ -17,6 +17,78 @@ const Arrow = () => (
       strokeLinejoin="round"
     />
   </svg>
+);
+
+const ProjectList = ({ items, className = "mt-14" }) => (
+  <div className={className}>
+    {items.map((project, i) => {
+      const href = project.liveLink || project.link;
+      return (
+        <article key={project.name} className="proj-row group">
+          <div className="flex items-start gap-5 sm:gap-8">
+            <span className="work-meta pt-2.5 shrink-0">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+
+            <div className="flex-1 min-w-0">
+              <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between gap-4"
+              >
+                <h3 className="proj-name work-serif text-3xl sm:text-5xl text-[#16150f]">
+                  {project.name}
+                </h3>
+                <Arrow />
+              </a>
+
+              {project.role && (
+                <p className="proj-desc work-meta mt-2">{project.role}</p>
+              )}
+
+              <p className="proj-desc text-sm leading-relaxed text-[#56544c] mt-3 max-w-xl line-clamp-2">
+                {project.description}
+              </p>
+
+              <div className="proj-desc flex items-center gap-6 mt-4">
+                {project.liveLink && (
+                  <a
+                    href={project.liveLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="work-link"
+                  >
+                    Live ↗
+                  </a>
+                )}
+                {project.link && (
+                  <a
+                    href={project.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="work-link"
+                  >
+                    GitHub ↗
+                  </a>
+                )}
+                {project.announcementLink && (
+                  <a
+                    href={project.announcementLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="work-link"
+                  >
+                    Announcement ↗
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+        </article>
+      );
+    })}
+  </div>
 );
 
 const Projects = ({ embedded = false }) => {
@@ -39,52 +111,30 @@ const Projects = ({ embedded = false }) => {
         hardware experiments. Plenty more on the way.
       </p>
 
-      <div className="mt-14">
-        {projects.map((project, i) => {
-          const href = project.liveLink || project.link;
-          return (
-            <a
-              key={project.name}
-              href={href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="proj-row group block"
-            >
-              <div className="flex items-start gap-5 sm:gap-8">
-                <span className="work-meta pt-2.5 shrink-0">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
+      <ProjectList items={projects} />
 
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-4">
-                    <h3 className="proj-name work-serif text-3xl sm:text-5xl text-[#16150f]">
-                      {project.name}
-                    </h3>
-                    <Arrow />
-                  </div>
-
-                  {project.role && (
-                    <p className="proj-desc work-meta mt-2">{project.role}</p>
-                  )}
-
-                  <p className="proj-desc text-sm leading-relaxed text-[#56544c] mt-3 max-w-xl line-clamp-2">
-                    {project.description}
-                  </p>
-
-                  <div className="proj-desc flex items-center gap-6 mt-4">
-                    {project.liveLink && (
-                      <span className="work-link">Live ↗</span>
-                    )}
-                    {project.link && (
-                      <span className="work-link">GitHub ↗</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </a>
-          );
-        })}
-      </div>
+      <details className="preai mt-20">
+        <summary className="preai-toggle">
+          pre-ai projects :p
+          <svg
+            className="preai-caret"
+            width="10"
+            height="10"
+            viewBox="0 0 10 10"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M3.2 1.8L6.8 5 3.2 8.2"
+              stroke="currentColor"
+              strokeWidth="1.3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </summary>
+        <ProjectList items={preAiProjects} className="mt-6" />
+      </details>
     </section>
   );
 };

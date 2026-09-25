@@ -203,6 +203,15 @@ export const socialLinks = [
 
 export const projects = [
   {
+    theme: "btn-back-green",
+    name: "Rein",
+    role: "2nd Place · Build for Builders Hackathon",
+    description:
+      "Git for agents. An agent-native memory layer on top of git. Where git stores code history, Rein stores semantic memory: rein commit distills each change's intent, reasoning, and notes for future agents into a searchable record, so agents can query past decisions with rein search before starting new work.",
+    link: "https://github.com/victoriamazilu/rein",
+    announcementLink: "https://lnkd.in/p/gBxiDb_6",
+  },
+  {
     iconUrl: pathfindr,
     theme: "btn-back-black",
     name: "Pathfindr",
@@ -211,6 +220,17 @@ export const projects = [
     link: "https://github.com/victoriamazilu/pathfindr",
     liveLink: "https://pathfindr.vmazilu.ca",
   },
+  {
+    iconUrl: icon,
+    theme: "btn-back-blue",
+    name: "This website!",
+    description:
+      "Everything you see right now! Built with Javascript, React, and much more...",
+    link: "https://github.com/victoriamazilu/portfolio-website",
+  },
+];
+
+export const preAiProjects = [
   {
     iconUrl: swarm,
     theme: "btn-back-yellow",
@@ -227,13 +247,5 @@ export const projects = [
     description:
       "Shower Scribe is a waterproof device that captures your shower thoughts for those eureka moments you just can't afford to forget. It instantly transcribes, auto-titles, groups, and provides LLM recaps for each recording, which is all displayed on a user-friendly web app.",
     link: "https://github.com/victoriamazilu/Shower-Scribe",
-  },
-  {
-    iconUrl: icon,
-    theme: "btn-back-blue",
-    name: "This website!",
-    description:
-      "Everything you see right now! Built with Javascript, React, and much more...",
-    link: "https://github.com/victoriamazilu/portfolio-website",
   },
 ];
