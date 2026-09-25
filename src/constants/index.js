@@ -203,6 +203,29 @@ export const socialLinks = [
 
 export const projects = [
   {
+    theme: "btn-back-black",
+    name: "Humanoid",
+    role: "VR Software Lead · Waterloo Reality Labs",
+    description:
+      "Led a team of six building tele-operation and VR data capture for humanoid training — Meta SDK hand tracking, a WebSocket server, and immersive remote piloting of a humanoid robot.",
+    liveLink: "https://uwrealitylabs.com/projects/humanoid",
+    links: [
+      { label: "Project", href: "https://uwrealitylabs.com/projects/humanoid" },
+      {
+        label: "Github (Teleop)",
+        href: "https://github.com/uwrealitylabs/humanoid-teleop",
+      },
+      {
+        label: "Github (Server)",
+        href: "https://github.com/uwrealitylabs/humanoid-server",
+      },
+      {
+        label: "Renderings",
+        href: "https://drive.google.com/drive/folders/1taINs5i9IZSJr-oUmL3eWnDw9OKiwipr?usp=sharing",
+      },
+    ],
+  },
+  {
     theme: "btn-back-green",
     name: "Rein",
     role: "2nd Place · Build for Builders Hackathon",

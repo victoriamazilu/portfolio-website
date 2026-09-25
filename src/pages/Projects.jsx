@@ -22,7 +22,19 @@ const Arrow = () => (
 const ProjectList = ({ items, className = "mt-14" }) => (
   <div className={className}>
     {items.map((project, i) => {
-      const href = project.liveLink || project.link;
+      const href =
+        project.liveLink || project.link || project.links?.[0]?.href;
+      const links =
+        project.links ||
+        [
+          project.liveLink && { label: "Live", href: project.liveLink },
+          project.link && { label: "GitHub", href: project.link },
+          project.announcementLink && {
+            label: "Announcement",
+            href: project.announcementLink,
+          },
+        ].filter(Boolean);
+
       return (
         <article key={project.name} className="proj-row group">
           <div className="flex items-start gap-5 sm:gap-8">
@@ -51,37 +63,18 @@ const ProjectList = ({ items, className = "mt-14" }) => (
                 {project.description}
               </p>
 
-              <div className="proj-desc flex items-center gap-6 mt-4">
-                {project.liveLink && (
+              <div className="proj-desc flex flex-wrap items-center gap-x-6 gap-y-2 mt-4">
+                {links.map((item) => (
                   <a
-                    href={project.liveLink}
+                    key={item.href}
+                    href={item.href}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="work-link"
                   >
-                    Live ↗
+                    {item.label} ↗
                   </a>
-                )}
-                {project.link && (
-                  <a
-                    href={project.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="work-link"
-                  >
-                    GitHub ↗
-                  </a>
-                )}
-                {project.announcementLink && (
-                  <a
-                    href={project.announcementLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="work-link"
-                  >
-                    Announcement ↗
-                  </a>
-                )}
+                ))}
               </div>
             </div>
           </div>
