@@ -22,7 +22,9 @@ const Home = () => {
   const [assistEnabled, setAssistEnabled] = useState(true);
   const [introComplete, setIntroComplete] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
   const isMobile = useIsMobile();
+  const desktopControlsLocked = !isMobile && !hasStarted;
 
   const handleIntroComplete = () => {
     setIntroComplete(true);
@@ -59,42 +61,26 @@ const Home = () => {
           type="button"
           onClick={() => setAssistEnabled((v) => !v)}
           aria-pressed={assistEnabled}
-          className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-lg shadow-md border border-white/60 px-3 py-2 text-xs font-semibold text-slate-700"
+          className="hud-chip"
         >
           <span>Flight assist</span>
-          <span
-            className={`relative w-9 h-5 rounded-full transition-colors ${
-              assistEnabled ? "bg-blue-500" : "bg-slate-300"
-            }`}
-          >
-            <span
-              className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                assistEnabled ? "translate-x-4" : ""
-              }`}
-            />
+          <span className={`hud-state${assistEnabled ? " is-on" : ""}`}>
+            {assistEnabled ? "On" : "Off"}
           </span>
         </button>
       </div>
 
       {isMobile && introComplete && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-20">
+        <div className="absolute top-24 left-1/2 -translate-x-1/2 z-20">
           <button
             type="button"
             onClick={() => setAssistEnabled((v) => !v)}
             aria-pressed={assistEnabled}
-            className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full shadow-md border border-white/60 px-3 py-1.5 text-xs font-semibold text-slate-700"
+            className="hud-chip"
           >
             <span>Flight assist</span>
-            <span
-              className={`relative w-9 h-5 rounded-full transition-colors ${
-                assistEnabled ? "bg-blue-500" : "bg-slate-300"
-              }`}
-            >
-              <span
-                className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-                  assistEnabled ? "translate-x-4" : ""
-                }`}
-              />
+            <span className={`hud-state${assistEnabled ? " is-on" : ""}`}>
+              {assistEnabled ? "On" : "Off"}
             </span>
           </button>
         </div>
@@ -133,7 +119,7 @@ const Home = () => {
             <FlightWorld
               onFirstMove={handleFirstMove}
               assistEnabled={assistEnabled}
-              flightFrozen={flightFrozen}
+              flightFrozen={flightFrozen || desktopControlsLocked}
               onExperienceUnlockStart={() => setFlightFrozen(true)}
               onExperienceUnlock={() => setIsExperienceOpen(true)}
               onProjectsUnlockStart={() => setFlightFrozen(true)}
@@ -174,7 +160,10 @@ const Home = () => {
 
       <InstructionsModal
         isOpen={showInstructions}
-        onClose={() => setShowInstructions(false)}
+        onClose={() => {
+          setShowInstructions(false);
+          setHasStarted(true);
+        }}
         assistEnabled={assistEnabled}
         onAssistChange={setAssistEnabled}
         isMobile={isMobile}
